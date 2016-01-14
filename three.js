@@ -48,7 +48,7 @@ var ItemTable = React.createClass(
                                              groups[item.location].items.push(item);
                                      });
             var table = this;
-            Object.keys(groups).forEach(function(group)
+            Object.keys(groups).sort().forEach(function(group)
                            {
                                rows.push(<Location key={groups[group].location} location={groups[group].location}/>);
                                groups[group].items.forEach(function(item)
