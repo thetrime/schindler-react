@@ -1,0 +1,38 @@
+th
+{
+    background: grey;
+}
+
+#container
+{
+    width: 400px;
+    height: 600px;
+    overflow-y: scroll;
+    border: 1px solid black;
+}
+
+.item_table
+{
+    width: 100%;
+}
+
+.search_field
+{
+    width: 100%;
+    box-sizing: border-box;
+}
+
+button
+{
+    float: right;
+}
+
+.button_column
+{
+    width: 100px;
+}
+
+body
+{
+    font-family: Helvetica;
+}
