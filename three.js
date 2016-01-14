@@ -1,20 +1,35 @@
 var ShoppingList = React.createClass(
     {
+        getInitialState: function()
+        {
+            return {filterText: ''};
+        },
+
+        redoSearch: function(value)
+        {
+            this.setState({filterText: value});
+        },
+        
         render: function()
         {
             return (<div>
-                      <SearchBox/>
-                      <ItemTable items={this.props.items}/>
+                    <SearchBox filterText={this.state.filterText} redoSearch={this.redoSearch}/>
+                    <ItemTable items={this.props.items} filterText={this.state.filterText}/>
                     </div>);
         }
     });
 
 var SearchBox = React.createClass(
     {
+        searchChanged : function()
+        {
+            this.props.redoSearch(this.refs.searchField.value);
+        },
+        
         render: function()
         {
             return (<form>
-                    <input type="text" placeholder="Search..." className="search_field"/>
+                    <input type="text" placeholder="Search..." className="search_field" onChange={this.searchChanged} value={this.props.filterText} ref="searchField"/>
                     </form>);
         }
     });
@@ -23,7 +38,8 @@ var ItemTable = React.createClass(
     {
         getInitialState : function()
         {
-            return {items:ITEMS};
+            return {items:ITEMS,
+                    filterText: this.props.filterText};
         },        
         gotItem: function(name)
         {
@@ -39,8 +55,11 @@ var ItemTable = React.createClass(
         {
             var rows = [];
             var groups = {};
+            var filter = this.props.filterText;
             this.state.items.forEach(function(item)
                                      {
+                                         if (filter != '' && item.name.indexOf(filter) != 0)
+                                             return;
                                          if (groups[item.location] === undefined)
                                              groups[item.location] = {location: item.location,
                                                                       items: [item]};
