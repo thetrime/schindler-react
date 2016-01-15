@@ -38,7 +38,7 @@ var ItemTable = React.createClass(
     {
         getInitialState : function()
         {
-            return {items:ITEMS};
+            return {items:this.props.items};
         },        
         gotItem: function(name)
         {
@@ -144,29 +144,29 @@ var NewItem = React.createClass(
     });
 
 
-var ITEMS = [{name:'apple', location:'lounge'},
-             {name:'orange', location:'lounge'},
-             {name:'guitar', location:'kitchen'},
-             {name:'banjo', location:'kitchen'},
-             {name:'soap', location:'bathroom'},
-             {name:'chutney', location:'bathroom'},
-             {name:'fish paste', location:'bathroom'},
-             {name:'gruel', location:'bathroom'},
-             {name:'pillow', location:'bedroom'},
-             {name:'boxes', location:'bedroom'},
-             {name:'apes', location:'bedroom'},
-             {name:'trampoline', location:'bedroom'},
-             {name:'curtains', location:'bedroom'},
-             {name:'floor', location:'bathroom'},
-             {name:'old timey jig', location:'kitchen'},
-             {name:'clocks', location:'lounge'},
-             {name:'banana', location:'lounge'},
-             {name:'guava', location:'lounge'},
-             {name:'peach', location:'lounge'},
-             {name:'durian', location:'lounge'},
-             {name:'mango', location:'lounge'}];
+var websocket = null;
+function initialize()
+{
+    var items = [];
+    websocket = new WebSocket("ws://localhost:9999/ws");
+    websocket.onmessage = handle_server_message;
+    websocket.onopen = function()
+    {
+        websocket.send(JSON.stringify({operation:"hello",
+                                       version:1}));
+        
+    };
 
+}
 
+function handle_server_message(event)
+{
+    var msg = JSON.parse(event.data);
+    if (msg.operation == "list")
+    {
+        ReactDOM.render(<ShoppingList items={msg.items}/>,                        
+                        document.getElementById("container"));
+    }
+}
 
-ReactDOM.render(<ShoppingList items={ITEMS}/>,
-                document.getElementById("container"));
+initialize();
