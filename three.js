@@ -14,7 +14,7 @@ var ShoppingList = React.createClass(
         {
             return (<div>
                     <SearchBox filterText={this.state.filterText} redoSearch={this.redoSearch}/>
-                    <ItemTable items={this.props.items} filterText={this.state.filterText}/>
+                    <ItemTable items={this.props.items} filterText={this.state.filterText} redoSearch={this.redoSearch}/>
                     </div>);
         }
     });
@@ -38,8 +38,7 @@ var ItemTable = React.createClass(
     {
         getInitialState : function()
         {
-            return {items:ITEMS,
-                    filterText: this.props.filterText};
+            return {items:ITEMS};
         },        
         gotItem: function(name)
         {
@@ -51,15 +50,26 @@ var ItemTable = React.createClass(
                                      });
             this.setState({items:new_items});
         },
+        addItem: function(name)
+        {
+            var new_items = this.state.items;
+            new_items.push({name: name,
+                            location: 'Unknown'});
+            this.setState({items:new_items});
+            this.props.redoSearch('');
+        },
         render: function()
         {
             var rows = [];
             var groups = {};
             var filter = this.props.filterText;
+            var exactMatch = false;
             this.state.items.forEach(function(item)
                                      {
                                          if (filter != '' && item.name.indexOf(filter) != 0)
                                              return;
+                                         if (filter != '' && item.name == filter)
+                                             exactMatch = true;
                                          if (groups[item.location] === undefined)
                                              groups[item.location] = {location: item.location,
                                                                       items: [item]};
@@ -67,6 +77,10 @@ var ItemTable = React.createClass(
                                              groups[item.location].items.push(item);
                                      });
             var table = this;
+            if (filter != '' && !exactMatch)
+            {
+                rows.push(<NewItem name={filter} key={filter} addItem={this.addItem}/>);
+            }            
             Object.keys(groups).sort().forEach(function(group)
                            {
                                rows.push(<Location key={groups[group].location} location={groups[group].location}/>);
@@ -113,6 +127,23 @@ var Item = React.createClass(
         }
     });
 
+var NewItem = React.createClass(
+    {
+        addItem: function()
+        {
+            this.props.addItem(this.props.name);
+        },
+        render: function()
+        {
+            return (<tr>
+                    <td>{this.props.name}</td>
+                    <td className="button_column"><button onClick={this.addItem}>Add New Item</button></td>
+                    </tr>);
+            
+        }
+    });
+
+
 var ITEMS = [{name:'apple', location:'lounge'},
              {name:'orange', location:'lounge'},
              {name:'guitar', location:'kitchen'},
@@ -134,6 +165,8 @@ var ITEMS = [{name:'apple', location:'lounge'},
              {name:'peach', location:'lounge'},
              {name:'durian', location:'lounge'},
              {name:'mango', location:'lounge'}];
+
+
 
 ReactDOM.render(<ShoppingList items={ITEMS}/>,
                 document.getElementById("container"));
