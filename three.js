@@ -76,13 +76,15 @@ var ItemTable = React.createClass(
                                                                rows.push(<Item name={item.name} key={item.name} gotItem={table.gotItem}/>);
                                                            });
                            });
-            return (<table className="item_table">
-                      <thead>
-                      </thead>
-                      <tbody>
-                        {rows}
-                      </tbody>
-                    </table>);
+            return (<div className="table_container">
+                    <table className="item_table">
+                    <thead>
+                    </thead>
+                    <tbody>
+                    {rows}
+                    </tbody>
+                    </table>
+                    </div>);
         }
     });
 
@@ -154,7 +156,7 @@ function initialize()
 
 function render()
 {
-    ReactDOM.render(<ShoppingList model={model}/>,
+    ReactDOM.render(<ShoppingList model={model} style="height: 100%;"/>,
                     document.getElementById("container"));
 
 }

@@ -1,15 +1,13 @@
 th
 {
     background: grey;
+    color: white;
 }
 
 #container
 {
-    /*width: 400px;
-      height: 600px;
-   */
-    overflow-y: scroll;
-    border: 1px solid black;
+    /*border: 1px solid black;*/
+    height: 100%;
 }
 
 .item_table
@@ -36,4 +34,23 @@ button
 body
 {
     font-family: Helvetica;
+    height: 100%;
+    margin: 0;
+}
+
+.table_container
+{
+    height: 100%;
+    overflow-y: scroll;        
+}
+
+html
+{
+    height: 100%;
+}
+
+/* It is weird that I cannot seem to add a class to this div? */
+#container > div
+{
+    height: 100%;
 }
