@@ -14,7 +14,7 @@ var ShoppingList = React.createClass(
         {
             return (<div>
                     <SearchBox filterText={this.state.filterText} redoSearch={this.redoSearch}/>
-                    <ItemTable items={this.props.items} filterText={this.state.filterText} redoSearch={this.redoSearch}/>
+                    <ItemTable model={this.props.model} filterText={this.state.filterText} redoSearch={this.redoSearch}/>
                     </div>);
         }
     });
@@ -36,26 +36,13 @@ var SearchBox = React.createClass(
 
 var ItemTable = React.createClass(
     {
-        getInitialState : function()
-        {
-            return {items:this.props.items};
-        },        
         gotItem: function(name)
         {
-            var new_items = [];
-            this.state.items.forEach(function(item)
-                                     {
-                                         if (item.name != name)
-                                             new_items.push(item);
-                                     });
-            this.setState({items:new_items});
+            websocket.send(JSON.stringify({operation:"got_item", name:name}));
         },
         addItem: function(name)
         {
-            var new_items = this.state.items;
-            new_items.push({name: name,
-                            location: 'Unknown'});
-            this.setState({items:new_items});
+            websocket.send(JSON.stringify({operation:"add_item", name:name}));
             this.props.redoSearch('');
         },
         render: function()
@@ -64,7 +51,7 @@ var ItemTable = React.createClass(
             var groups = {};
             var filter = this.props.filterText;
             var exactMatch = false;
-            this.state.items.forEach(function(item)
+            this.props.model.forEach(function(item)
                                      {
                                          if (filter != '' && item.name.indexOf(filter) != 0)
                                              return;
@@ -143,11 +130,10 @@ var NewItem = React.createClass(
         }
     });
 
-
+var model = [];
 var websocket = null;
 function initialize()
 {
-    var items = [];
     websocket = new WebSocket("ws://localhost:9999/ws");
     websocket.onmessage = handle_server_message;
     websocket.onopen = function()
@@ -159,13 +145,34 @@ function initialize()
 
 }
 
+function render()
+{
+    ReactDOM.render(<ShoppingList model={model}/>,
+                    document.getElementById("container"));
+
+}
+
 function handle_server_message(event)
 {
     var msg = JSON.parse(event.data);
     if (msg.operation == "list")
     {
-        ReactDOM.render(<ShoppingList items={msg.items}/>,                        
-                        document.getElementById("container"));
+        model = msg.items;
+        render();
+    }
+    if (msg.operation == "got_item_ack")
+    {
+        model = model.filter(function(item)
+                             {
+                                 return item.name != msg.name;
+                             });
+        render();
+    }
+    if (msg.operation == "add_item_ack")
+    {
+        model.push({name: msg.name,
+                    location: msg.location});
+        render();
     }
 }
 
