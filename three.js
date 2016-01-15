@@ -134,7 +134,14 @@ var model = [];
 var websocket = null;
 function initialize()
 {
-    websocket = new WebSocket("ws://localhost:9999/ws");
+    var loc = window.location, uri;
+    if (loc.protocol === "https:") 
+        uri = "wss:";
+    else
+        uri = "ws:";
+    uri += "//" + loc.host;
+    uri += loc.pathname + "ws";
+    websocket = new WebSocket(uri);
     websocket.onmessage = handle_server_message;
     websocket.onopen = function()
     {

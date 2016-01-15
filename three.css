@@ -5,8 +5,9 @@ th
 
 #container
 {
-    width: 400px;
-    height: 600px;
+    /*width: 400px;
+      height: 600px;
+   */
     overflow-y: scroll;
     border: 1px solid black;
 }
