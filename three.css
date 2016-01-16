@@ -4,12 +4,6 @@ th
     color: white;
 }
 
-#container
-{
-    /*border: 1px solid black;*/
-    height: 100%;
-}
-
 .item_table
 {
     width: 100%;
@@ -34,23 +28,47 @@ button
 body
 {
     font-family: Helvetica;
-    height: 100%;
     margin: 0;
 }
 
-.table_container
-{
-    height: 100%;
-    overflow-y: scroll;        
-}
-
-html
+html, body
 {
     height: 100%;
 }
 
 /* It is weird that I cannot seem to add a class to this div? */
-#container > div
+.search_bar
 {
-    height: 100%;
+    position: fixed;
+    height: 20px;
+    width: 100%;
+    background: white;
+    top: 0;
+}
+
+.table_container
+{
+    padding-top:20px;
+    height: 100vh;
+}
+
+@media only screen and (max-width: 800px)
+{
+    body
+    {
+        font-size: 14pt;
+        x-line-height: 50px;
+    }
+
+    .search_field
+    {
+        font-size: 14pt;
+        auto-capitalize: off;
+    }
+
+    .table_container
+    {
+        padding-top:40px;
+    }
+    
 }

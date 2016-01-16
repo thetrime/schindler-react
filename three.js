@@ -28,8 +28,8 @@ var SearchBox = React.createClass(
         
         render: function()
         {
-            return (<form>
-                    <input type="text" placeholder="Search..." className="search_field" onChange={this.searchChanged} value={this.props.filterText} ref="searchField"/>
+            return (<form className="search_bar">
+                    <input type="search" placeholder="Search..." className="search_field" autoCapitalize="off" onChange={this.searchChanged} value={this.props.filterText} ref="searchField"/>
                     </form>);
         }
     });
