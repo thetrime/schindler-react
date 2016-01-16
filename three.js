@@ -186,3 +186,24 @@ function handle_server_message(event)
 }
 
 initialize();
+
+
+/* To do list:
+   * Reconnect if socket is lost
+      * Indicate broken connection somewhere
+   * Store list in database
+   * Geolocation for store
+   * Configure location if unknown when purchased
+   * Maintenance screen for items
+   * Maintenance screen for stores
+   * Undo
+   * Details screen for items
+   * Defer mode
+   * Multiple users
+   * Offline mode?
+      * Queue messages for delivery to server
+      * All messages must therefore be relative; applied in different orders?
+      * Need to keep some state on the client then (the queued messages plus the current state)
+   * Native version :P
+
+*/
