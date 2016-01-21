@@ -46,9 +46,9 @@ client(ClientId, Class, WebSocket) :-
             client(ClientId, Class, WebSocket)
         ).
 
-ws_send_message(Class, Json):-
+ws_send_message(Class, Key, Data):-
         with_output_to(atom(Atom),
-                       json_write(current_output, Json)),
+                       json_write(current_output, _{operation:Key, data:Data})),
         forall(listener(Class, ClientId),
                thread_send_message(ClientId, send(Atom))).
 
@@ -76,18 +76,18 @@ handle_message(Class, hello, _):-
         findall(_{name:Name, location:Location},
                 pending_item(Name, Location),
                 Items),        
-        ws_send_message(Class, _{operation:list, items:Items}).
+        ws_send_message(Class, list, _{items:Items}).
 
 handle_message(Class, got_item, Message):-
         Name = Message.name,
         retractall(pending_item(Name, _)),
-        ws_send_message(Class, _{operation:got_item_ack, name:Name}).
+        ws_send_message(Class, got_item_ack, _{name:Name}).
 
 handle_message(Class, add_item, Message):-
         Name = Message.name,
         Location = unknown,
         assert(pending_item(Name, Location)),
-        ws_send_message(Class, _{operation:add_item_ack, name:Name, location:Location}).
+        ws_send_message(Class, add_item_ack, _{name:Name, location:Location}).
 
 
 

@@ -1,21 +1,102 @@
-var ShoppingList = React.createClass(
+var SchindlerApp = React.createClass(
     {
         getInitialState: function()
         {
-            return {filterText: ''};
+            return {currentView: "shop",
+                    connectionStatus: "disconnected"};
+        },
+
+        switchMode: function(newMode)
+        {
+            setState({currentMode: newMode});
+        },
+        onConnect: function()
+        {
+            this.setState({connectionStatus:"connected"});
+        },
+        onDisconnect: function()
+        {
+            this.setState({connectionStatus:"disconnected"});
+        },
+        
+        componentWillMount: function()
+        {
+            server_connection.registerFor("connect", this.onConnect);
+            server_connection.registerFor("disconnect", this.onDisconnect);
+            
+        },
+        
+        render: function()
+        {
+            if (this.state.currentView == "shop")
+                return (<div>
+                        <ShoppingView model={model}/>
+                        <ConnectionInfo status={this.state.connectionStatus}/>
+                        </div>);
+            else if (this.state.currentView == "select_aisle")
+                return (<div>
+                        Select your aisle panel goes here
+                        <ConnectionInfo status={this.state.connectionStatus}/>
+                        </div>);
+        }
+        
+    });
+
+var ShoppingView = React.createClass(
+    {
+        getInitialState: function()
+        {
+            return {filterText: '',
+                    items: []};
         },
 
         redoSearch: function(value)
         {
             this.setState({filterText: value});
         },
+
+        onListChange: function(data)
+        {
+            this.setState({items: data.items});
+        },
+
+        gotItem: function(item)
+        {
+            this.setState({items: this.state.items.filter(function(existing_item)
+                                                          {
+                                                              return existing_item.name != item.name;
+                                                          })});
+        },
+
+        addItem: function(item)
+        {
+            this.setState({items: this.state.items.concat([item])});
+        },
+        
+        componentWillMount: function()
+        {
+            server_connection.registerFor("list", this.onListChange);
+            server_connection.registerFor("got_item_ack", this.gotItem);
+            server_connection.registerFor("add_item_ack", this.addItem);
+        },
         
         render: function()
         {
             return (<div>
                     <SearchBox filterText={this.state.filterText} redoSearch={this.redoSearch}/>
-                    <ItemTable model={this.props.model} filterText={this.state.filterText} redoSearch={this.redoSearch}/>
+                    <ItemTable model={this.state.items} filterText={this.state.filterText} redoSearch={this.redoSearch}/>
                     </div>);
+        }
+    });
+
+var ConnectionInfo = React.createClass(
+    {
+        render: function()
+        {
+            if (this.props.status == "connected")
+                return (<div/>);
+            else
+                return (<div className="connection_bar">Reestablishing connection...</div>);
         }
     });
 
@@ -38,11 +119,13 @@ var ItemTable = React.createClass(
     {
         gotItem: function(name)
         {
-            websocket.send(JSON.stringify({operation:"got_item", name:name}));
+            // Here we need to change the entire app to aisle-select (and possibly store-select!) view.
+            // This is why 2-way binding between views ends up as a total mess
+            server_connection.sendMessage({operation:"got_item", name:name});
         },
         addItem: function(name)
         {
-            websocket.send(JSON.stringify({operation:"add_item", name:name}));
+            server_connection.sendMessage({operation:"add_item", name:name});
             this.props.redoSearch('');
         },
         render: function()
@@ -133,64 +216,88 @@ var NewItem = React.createClass(
     });
 
 var model = [];
-var websocket = null;
-function initialize()
-{
-    var loc = window.location, uri;
-    if (loc.protocol === "https:") 
-        uri = "wss:";
-    else
-        uri = "ws:";
-    uri += "//" + loc.host;
-    uri += loc.pathname + "ws";
-    websocket = new WebSocket(uri);
-    websocket.onmessage = handle_server_message;
-    websocket.onopen = function()
+var server_connection =
     {
-        websocket.send(JSON.stringify({operation:"hello",
-                                       version:1}));
-        
+        websocket: null,
+        listeners: {},        
+        handle_server_connect: function()
+        {
+            this.sendMessage({operation:"hello",version:1});
+            this.dispatchEvent("connect");
+        },
+        handle_server_disconnect: function()
+        {
+            console.log("Close detected. Reopening connection in 3 seconds...");
+            this.dispatchEvent("disconnect");
+            var that = this;
+            setTimeout(function() {that.sendMessage({operation:"ping"})}, 3000);
+        },
+        dispatchEvent: function(key, data)
+        {
+            console.log("Dispatching " + key);
+            if (this.listeners[key] !== undefined)
+            {
+                this.listeners[key].forEach(function(fn)  { fn(data); });
+            }
+        },
+        registerFor: function(event, callback)
+        {
+            if (this.listeners[event] === undefined)
+                this.listeners[event] = [callback];
+            else
+                this.listeners[event].push(callback);
+        },
+        sendMessage: function(message)
+        {
+            if (this.websocket.readyState == this.websocket.OPEN)
+            {
+                console.log("Connection OK");
+                this.websocket.send(JSON.stringify(message));
+            }
+            else
+            {
+                // FIXME: The message actually doesn't get sent here?
+                console.log("Connection lost....");
+                dispatchEvent("disconnect");
+                var new_websocket = new WebSocket(uri);
+                new_websocket.onmessage = this.websocket.onmessage;
+                new_websocket.onopen = this.websocket.onopen;
+                new_websocket.onclose = this.websocket.onclose;
+                new_websocket.onerror = this.websocket.onerror;
+                this.websocket = new_websocket;
+            }
+        },
+        handle_server_message: function(event)
+        {
+            var msg = JSON.parse(event.data);
+            this.dispatchEvent(msg.operation, msg.data);
+        },
+        initialize: function()
+        {
+            var loc = window.location;
+            var uri = "ws:";
+            if (loc.protocol === "https:") 
+                uri = "wss:";
+            uri += "//" + loc.host;
+            uri += loc.pathname + "ws";
+            console.log(uri);
+            this.websocket = new WebSocket(uri);
+            this.websocket.onmessage = this.handle_server_message.bind(this);
+            this.websocket.onclose = this.handle_server_disconnect.bind(this);
+            this.websocket.onopen = this.handle_server_connect.bind(this);
+        }
     };
 
-}
+server_connection.initialize();
+ReactDOM.render(<SchindlerApp mode="shop"/>,
+                document.getElementById("container"));
 
-function render()
-{
-    ReactDOM.render(<ShoppingList model={model} style="height: 100%;"/>,
-                    document.getElementById("container"));
-
-}
-
-function handle_server_message(event)
-{
-    var msg = JSON.parse(event.data);
-    if (msg.operation == "list")
-    {
-        model = msg.items;
-        render();
-    }
-    if (msg.operation == "got_item_ack")
-    {
-        model = model.filter(function(item)
-                             {
-                                 return item.name != msg.name;
-                             });
-        render();
-    }
-    if (msg.operation == "add_item_ack")
-    {
-        model.push({name: msg.name,
-                    location: msg.location});
-        render();
-    }
-}
 
 initialize();
 
 
 /* To do list:
-   * Reconnect if socket is lost
-      * Indicate broken connection somewhere
+   * Restructure to use Flux, now that I understand data flow
    * Store list in database
    * Geolocation for store
    * Configure location if unknown when purchased
@@ -198,12 +305,20 @@ initialize();
    * Maintenance screen for stores
    * Undo
    * Details screen for items
-   * Defer mode
+   * Defer mode and relocate mode.
    * Multiple users
    * Offline mode?
       * Queue messages for delivery to server
       * All messages must therefore be relative; applied in different orders?
       * Need to keep some state on the client then (the queued messages plus the current state)
    * Native version :P
+
+I *think* that state is something that must be preserved between renders. Things like: The value in an input which a user has started typing?
+
+I think I need a more complicated thing for my websocket; something you can subscribe to events on (like onClose), and subscribe to messages with a particular tag.
+Then I can pass this thing around as a property. Components can listen for events on it and call setState() as needed.
+
+I should then add on componentDidMount, and remove it on componentDidUmount
+
 
 */
