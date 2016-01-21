@@ -1,3 +1,7 @@
+var Dispatcher = require('flux').Dispatcher;
+var React = require('react');
+var ReactDOM = require('react-dom');
+
 var SchindlerApp = React.createClass(
     {
         getInitialState: function()
@@ -287,13 +291,11 @@ var server_connection =
             this.websocket.onopen = this.handle_server_connect.bind(this);
         }
     };
-
+console.log("Reload magic 2");
 server_connection.initialize();
 ReactDOM.render(<SchindlerApp mode="shop"/>,
                 document.getElementById("container"));
 
-
-initialize();
 
 
 /* To do list:
