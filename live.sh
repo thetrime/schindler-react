@@ -1,2 +1,2 @@
 #!/bin/bash
-beefy three.js:bundle.js --live -- three.js -o bundle.js  -t [ babelify --presets [ es2015 react ] ]
+watchify schindler.jsx -v -o build/bundle.js -t [ babelify --presets [ es2015 react ] ]
