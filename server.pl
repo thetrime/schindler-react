@@ -12,7 +12,7 @@ http:location(schindler, '/schindler', []).
 
 
 :- http_handler(schindler(ws), http_upgrade_to_websocket(ws, []), [spawn([])]).
-:- http_handler(schindler(.), http_reply_from_files('.', [indexes(['three.html'])]), [prefix]).
+:- http_handler(schindler(.), http_reply_from_files('.', [indexes(['schindler.html'])]), [prefix]).
 
 
 :-dynamic(pending_item/2).
