@@ -34,7 +34,8 @@ client(ClientId, Class, WebSocket) :-
         ; Message.opcode == text ->
             Data = Message.data,
             Operation = Data.operation,
-            ( catch(handle_message(Class, Operation, Data),
+            Fields = Data.data,
+            ( catch(handle_message(Class, Operation, Fields),
                     Exception,
                     format(user_error, 'Error: ~p~n', [Exception]))->
                 true
@@ -81,13 +82,13 @@ handle_message(Class, hello, _):-
 handle_message(Class, got_item, Message):-
         Name = Message.name,
         retractall(pending_item(Name, _)),
-        ws_send_message(Class, got_item_ack, _{name:Name}).
+        ws_send_message(Class, delete_item, _{name:Name}).
 
-handle_message(Class, add_item, Message):-
+handle_message(Class, new_item, Message):-
         Name = Message.name,
         Location = unknown,
         assert(pending_item(Name, Location)),
-        ws_send_message(Class, add_item_ack, _{name:Name, location:Location}).
+        ws_send_message(Class, add_item, _{name:Name, location:Location}).
 
 
 
@@ -115,4 +116,5 @@ pending_item(guava, lounge).
 pending_item(peach, lounge).
 pending_item(durian, lounge).
 pending_item(mango, lounge).
+pending_item(worms, unknown).
 

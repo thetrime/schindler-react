@@ -1,29 +1,30 @@
 {
-    "name": "schindler-react",
-    "version": "1.0.0",
-    "description": "",
-    "main": "bundle.js",
-    "dependencies": {
-        "babel-preset-es2015": "^6.3.13",
-        "flux": "^2.1.1",
-        "babelify": "^7.2.0",
-        "babel-preset-react": "^6.3.13",
-        "react-dom": "^0.14.6",
-        "react": "^0.14.6"
-    },
-    "devDependencies": {},
-    "scripts": {
-        "start": "STATIC_ROOT=./static watchify schindler.jsx -v -o build/bundle.js -t [ babelify --presets [ es2015 react ] ]",
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/thetrime/schindler-react.git"
-    },
-    "author": "",
-    "license": "GPLv3",
-    "bugs": {
-        "url": "https://github.com/thetrime/schindler-react/issues"
-    },
-    "homepage": "https://github.com/thetrime/schindler-react#readme"
+  "name": "schindler-react",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bundle.js",
+  "dependencies": {
+    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-react": "^6.3.13",
+    "babelify": "^7.2.0",
+    "flux": "^2.1.1",
+    "object-assign": "^4.0.1",
+    "react": "^0.14.6",
+    "react-dom": "^0.14.6"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "STATIC_ROOT=./static watchify schindler.jsx -v -o build/bundle.js -t [ babelify --presets [ es2015 react ] ]",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thetrime/schindler-react.git"
+  },
+  "author": "",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/thetrime/schindler-react/issues"
+  },
+  "homepage": "https://github.com/thetrime/schindler-react#readme"
 }
