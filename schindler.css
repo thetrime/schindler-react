@@ -116,16 +116,16 @@ html, body
 
 .vertical_layout > .vertical_fill
 {
-    -webkit-flex: 1 0;
+    -webkit-flex: 1 0 0;
     -webkit-box-flex: 1;
-    flex: 1 0;
+    flex: 1 0 0;
 }
 
 .horizontal_layout > .horizontal_fill
 {
-    -webkit-flex: 1 0;
+    -webkit-flex: 1 0 0;
     -webkit-box-flex: 1;
-    flex: 1 0;
+    flex: 1 0 0;
 }
 
 .horizontal_layout > .vertical_fill
