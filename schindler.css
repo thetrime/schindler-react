@@ -79,15 +79,6 @@ html, body
         font-size: 12pt;
     }
 
-    .shopName
-    {
-        height: 50px;
-    }
-
-    .search_bar
-    {
-        height: 70px;
-    }
 
 }
 
@@ -125,16 +116,16 @@ html, body
 
 .vertical_layout > .vertical_fill
 {
-    -webkit-flex: 1; 
+    -webkit-flex: 1 0;
     -webkit-box-flex: 1;
-    flex: 1 1 auto;
+    flex: 1 0;
 }
 
 .horizontal_layout > .horizontal_fill
 {
-    -webkit-flex: 1;  
+    -webkit-flex: 1 0;
     -webkit-box-flex: 1;
-    flex: 1 1 auto;
+    flex: 1 0;
 }
 
 .horizontal_layout > .vertical_fill
