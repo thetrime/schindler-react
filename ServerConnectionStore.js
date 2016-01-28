@@ -23,7 +23,6 @@ var ServerConnectionStore = assign({},
                                        /* Actual logic */
                                        getConnectionStatus: function()
                                        {
-                                           console.log("here?" + status);
                                            return status;
                                        }
                                        

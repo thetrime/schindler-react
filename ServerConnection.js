@@ -2,19 +2,40 @@ var AppDispatcher = require('./AppDispatcher');
 
 module.exports =
     {
+        queued_messages: [],
         websocket: null,
         handle_server_connect: function()
         {
             this.sendMessage({operation:"hello",data:{version:1}});
             this.dispatchEvent("connection", "connected");
+            this.dispatchQueuedMessages();
         },
         handle_server_disconnect: function()
         {
             console.log("Close detected. Reopening connection in 3 seconds...");
             this.dispatchEvent("connection", "disconnected");
             var that = this;
-            setTimeout(function() {that.sendMessage({operation:"ping"})}, 3000);
+            setTimeout(function() {that.reconnect();}, 3000);
         },
+
+        reconnect: function()
+        {
+            var new_websocket = new WebSocket(this.uri);
+            new_websocket.onmessage = this.websocket.onmessage;
+            new_websocket.onopen = this.websocket.onopen;
+            new_websocket.onclose = this.websocket.onclose;
+            new_websocket.onerror = this.websocket.onerror;
+            this.websocket = new_websocket;
+        },
+
+        dispatchQueuedMessages: function()
+        {
+            var copy = this.queued_messages;
+            this.queued_messages = [];
+            localStorage.setItem("pending_messages", JSON.stringify(this.queued_messages));
+            copy.forEach(function(message) {this.sendMessage(message);}.bind(this));
+        },
+        
         dispatchEvent: function(key, data)
         {
             AppDispatcher.dispatch({operation:key,
@@ -28,15 +49,8 @@ module.exports =
             }
             else
             {
-                // FIXME: The (user) message actually doesn't get re-queued for sending here?
-                console.log("Connection lost....");
-                dispatchEvent("connection", "disconnected");
-                var new_websocket = new WebSocket(uri);
-                new_websocket.onmessage = this.websocket.onmessage;
-                new_websocket.onopen = this.websocket.onopen;
-                new_websocket.onclose = this.websocket.onclose;
-                new_websocket.onerror = this.websocket.onerror;
-                this.websocket = new_websocket;
+                this.queued_messages.push(message);
+                localStorage.setItem("pending_messages", JSON.stringify(this.queued_messages));
             }
         },
         handle_server_message: function(event)
@@ -47,12 +61,13 @@ module.exports =
         initialize: function()
         {
             var loc = window.location;
-            var uri = "ws:";
+            this.queued_messages = JSON.parse(localStorage.getItem("pending_messages"));
+            this.uri = "ws:";
             if (loc.protocol === "https:") 
-                uri = "wss:";
-            uri += "//" + loc.host;
-            uri += loc.pathname + "ws";
-            this.websocket = new WebSocket(uri);
+                this.uri = "wss:";
+            this.uri += "//" + loc.host;
+            this.uri += loc.pathname + "ws";
+            this.websocket = new WebSocket(this.uri);
             this.websocket.onmessage = this.handle_server_message.bind(this);
             this.websocket.onclose = this.handle_server_disconnect.bind(this);
             this.websocket.onopen = this.handle_server_connect.bind(this);
