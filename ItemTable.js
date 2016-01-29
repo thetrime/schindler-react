@@ -9,10 +9,11 @@ module.exports = React.createClass(
     {     
         addItem: function(name)
         {
-            //AppDispatcher.dispatch({operation:"new_item",
-            //                        data:this.props.item});
-            ServerConnection.sendMessage({operation:"new_item",
-                                          data:{name:name}});
+            AppDispatcher.dispatch({operation:"new_item",
+                                    data:{name:name,
+                                         location:"unknown"}});
+            //ServerConnection.sendMessage({operation:"new_item",
+            //                              data:{name:name}});
             this.props.redoSearch('');
         },
         render: function()
