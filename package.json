@@ -14,15 +14,16 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "STATIC_ROOT=./static watchify schindler.jsx -v -o build/bundle.js -t [ babelify --presets [ es2015 react ] ]",
-    "test": "echo \"Error: no test specified\" && exit 1"
+      "start": "STATIC_ROOT=./static watchify schindler.jsx -v -o build/bundle.js -t [ babelify --presets [ es2015 react ] ]",
+      "install": "STATIC_ROOT=./static browserify schindler.jsx -v -o build/bundle.js  -t [ babelify --presets [ es2015 react ] ]",
+      "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/thetrime/schindler-react.git"
   },
   "author": "",
-  "license": "GPLv3",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/thetrime/schindler-react/issues"
   },
