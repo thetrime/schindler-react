@@ -15,7 +15,6 @@ http:location(schindler, '/schindler', []).
 :- http_handler(schindler(.), http_reply_from_files('.', [indexes(['schindler.html'])]), [prefix]).
 
 
-:-dynamic(pending_item/2).
 :-dynamic(listener/2).
 
 ws(Websocket):-
@@ -74,47 +73,137 @@ run:-
 %-------------------------------------
 
 handle_message(Class, hello, _):-
-        findall(_{name:Name, location:Location},
-                pending_item(Name, Location),
-                Items),        
-        ws_send_message(Class, list, _{items:Items}).
+        Key = fixme,
+        Checkpoint = fixme,
+        world_information(Key, Checkpoint, World),
+        list_information(Key, Checkpoint, List),
+        ws_send_message(Class, hello, _{world:World,
+                                        list:List}).
 
 handle_message(Class, got_item, Message):-
         Name = Message.name,
-        retractall(pending_item(Name, _)),
+        retractall(list_item(Name)),
         ws_send_message(Class, delete_item, _{name:Name}).
 
 handle_message(Class, new_item, Message):-
         Name = Message.name,
-        Location = unknown,
-        assert(pending_item(Name, Location)),
-        ws_send_message(Class, add_item, _{name:Name, location:Location}).
+        assert(item(Name)),
+        assert(list_item(Name)),
+        ws_send_message(Class, add_list_item, _{name:Name}).
+
+
+handle_message(Class, want_item, Message):-
+        Name = Message.name,
+        assert(list_item(Name)),
+        ws_send_message(Class, add_list_item, _{name:Name}).
+
+handle_message(Class, set_item_location, Message):-
+        Item = Message.item,
+        Location = Message.location,
+        Store = Message.store,
+        retractall(known_item_location(Item, Store, Location)),
+        assert(known_item_location(Item, Store, Location)),
+        ws_send_message(Class, set_item_location, Message).
 
 
 
 
+:-dynamic(list_item/1).
+:-dynamic(store/1).
+:-dynamic(aisle/2).
+:-dynamic(item/1).
+:-dynamic(known_item_location/3).
 
 
-pending_item(apple, lounge).
-pending_item(orange, lounge).
-pending_item(guitar, kitchen).
-pending_item(banjo, kitchen).
-pending_item(soap, bathroom).
-pending_item(chutney, bathroom).
-pending_item('fish paste', bathroom).
-pending_item(gruel, bathroom).
-pending_item(pillow, bedroom).
-pending_item(boxes, bedroom).
-pending_item(apes, bedroom).
-pending_item(trampoline, bedroom).
-pending_item(curtains, bedroom).
-pending_item(floor, bathroom).
-pending_item('old timey jig', kitchen).
-pending_item(clocks, lounge).
-pending_item(banana, lounge).
-pending_item(guava, lounge).
-pending_item(peach, lounge).
-pending_item(durian, lounge).
-pending_item(mango, lounge).
-pending_item(worms, unknown).
+list_item(apple).
+list_item(orange).
+list_item(guitar).
+list_item(banjo).
+list_item(soap).
+list_item(chutney).
+list_item('fish paste').
+list_item(gruel).
+list_item(boxes).
+list_item(apes).
+list_item(trampoline).
+list_item(floor).
+list_item('old timey jig').
+list_item(banana).
+list_item(guava).
+list_item(peach).
+list_item(durian).
+list_item(mango).
+list_item(worms).
 
+
+store(home).
+store(tesco).
+store(qfc).
+
+aisle(home, lounge).
+aisle(home, kitchen).
+aisle(home, bathroom).
+aisle(home, bedroom).
+
+aisle(qfc, produce).
+aisle(tesco, produce).
+
+item(apple).
+item(orange).
+item(guitar).
+item(banjo).
+item(soap).
+item(chutney).
+item('fish paste').
+item(gruel).
+item(pillow).
+item(boxes).
+item(apes).
+item(trampoline).
+item(curtains).
+item(floor).
+item('old timey jig').
+item(clocks).
+item(banana).
+item(guava).
+item(peach).
+item(durian).
+item(mango).
+item(worms).
+
+known_item_location(apple, qfc, produce).
+known_item_location(apple, tesco, produce).
+known_item_location(apple, home, lounge).
+
+known_item_location(orange, qfc, produce).
+known_item_location(orange, tesco, produce).
+
+known_item_location(pillow, home, bathroom).
+
+item_location(Item, Store, Aisle):-
+        known_item_location(Item, Store, Aisle).
+
+item_location(Item, Store, unknown):-
+        item(Item),
+        store(Store),
+        \+known_item_location(Item, Store, _).
+
+world_information(_, _, Data):-
+        bagof(x{store_name:Store,
+                aisles:Aisles},
+              bagof(y{aisle_name:Aisle,
+                      items:Items},
+                    bagof(Item,
+                          item_location(Item, Store, Aisle),
+                          Items),
+                    Aisles),
+              Data).
+
+list_information(_, _, Data):-
+        bagof(x{name:Name},
+              list_item(Name),
+              Data).
+
+
+% This is quite inefficient. We report that every item we know is in the unknown aisle for every store. It might be better to optimise that out
+% and just return a single list of all items *once*, and a list of items in a given store where known

@@ -4,18 +4,16 @@ var AppDispatcher = require('./AppDispatcher');
 
 module.exports = React.createClass(
     {
-        gotIt: function()
+        onClick: function()
         {
-            console.log("a");
-            AppDispatcher.dispatch({operation:"got_item",
-                                    data:this.props.item});
-            console.log("b");
+            this.props.onClick(this.props.item);
         },        
         render: function()
         {
+            var label = this.props.label;
             return (<tr>
                     <td>{this.props.item.name}</td>
-                    <td className="button_column"><button onClick={this.gotIt}>Got it!</button></td>
+                    <td className="button_column"><button onClick={this.onClick}>{label}</button></td>
                     </tr>);
         }
     });

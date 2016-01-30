@@ -2,7 +2,10 @@ var AppDispatcher = require('./AppDispatcher');
 var assign = require('object-assign');
 var EventEmitter = require('events').EventEmitter;
 var ServerConnection = require('./ServerConnection');
+var StoreStore = require('./StoreStore');
+var SchindlerStore = require('./SchindlerStore');
 var items = [];
+
 
 var ShoppingItemStore = assign({},
                                EventEmitter.prototype,
@@ -28,12 +31,33 @@ var ShoppingItemStore = assign({},
                                    
                                });
 
+function setItems(i)
+{
+    items = [];
+    i.forEach(function(item)              
+              {
+                  addItem(item);
+              });
+}
+
+function addItem(item)
+{
+    var new_item = {name:item.name,
+                    location:StoreStore.getAisleFor(item.name)};
+    items.push(new_item);
+
+}
+
 ShoppingItemStore.dispatchToken = AppDispatcher.register(function(event)
                                                          {
-                                                             if (event.operation == "list")
+                                                             if (event.operation == "hello")
                                                              {
                                                                  // This is a complete update from the server. We only get this when we send a "hello" message
-                                                                 items = event.data.items;
+                                                                 // But we must wait for the world view to be loaded first
+                                                                 AppDispatcher.waitFor([StoreStore.dispatchToken]);
+                                                                 // Then we load in the list
+                                                                 // and configure the list item locations
+                                                                 setItems(event.data.list);
                                                                  ShoppingItemStore.emitChange();
                                                              }
                                                              if (event.operation == "got_item" && event.data.location != "unknown")
@@ -44,20 +68,20 @@ ShoppingItemStore.dispatchToken = AppDispatcher.register(function(event)
                                                                  ShoppingItemStore.emitChange();
                                                                  // Though also actually send the message!
                                                                  ServerConnection.sendMessage(event);
-                                                             }
+                                                             }                                       
                                                              if (event.operation == "delete_item")
                                                              {
                                                                  // The server wants us to remove an item
                                                                  items = items.filter(function(a) { return a.name != event.data.name });
                                                                  ShoppingItemStore.emitChange();
                                                              }
-                                                             if (event.operation == "add_item")
+                                                             if (event.operation == "add_list_item")
                                                              {
                                                                  // The server wants us to add an item
                                                                  var found = false;
                                                                  for (var i = 0; i < items.length; i++)
                                                                  {
-                                                                     if ((items[i].name == event.data.name) && (items[i].location == event.data.location))
+                                                                     if (items[i].name == event.data.name)
                                                                      {
                                                                          found = true;
                                                                          break;
@@ -65,8 +89,8 @@ ShoppingItemStore.dispatchToken = AppDispatcher.register(function(event)
                                                                  }
                                                                  if (!found)
                                                                  {
-                                                                     console.log("Adding item " + event.data);
-                                                                     items = items.concat([event.data]);
+                                                                     console.log("Adding item " + event.data.name);
+                                                                     addItem(event.data);
                                                                      ShoppingItemStore.emitChange();                                                                     
                                                                  }
                                                                  else
@@ -76,10 +100,10 @@ ShoppingItemStore.dispatchToken = AppDispatcher.register(function(event)
                                                              }
                                                              if (event.operation == "new_item")
                                                              {
-                                                                 // We want to add an item
+                                                                 // The user wants to add an item
                                                                  // First, add it locally
                                                                  console.log("Adding " + event.data);
-                                                                 items = items.concat([event.data]);
+                                                                 addItem(event.data);
                                                                  ShoppingItemStore.emitChange();
                                                                  // then tell the server
                                                                  ServerConnection.sendMessage(event);

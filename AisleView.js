@@ -1,12 +1,13 @@
 var React = require('react');
 var ShoppingItemStore = require('./ShoppingItemStore');
 var SearchBox = require('./SearchBox');
-var ItemTable = require('./AisleTable');
+var AisleTable = require('./AisleTable');
 var ServerConnection = require('./ServerConnection');
+var StoreStore = require('./StoreStore');
 
 function getStateFromStore()
 {
-    return {aisles: ShoppingItemStore.getItems()};
+    return {aisles: StoreStore.getAislesForCurrentStore()};
 }
 
 
@@ -15,7 +16,7 @@ module.exports = React.createClass(
         getInitialState: function()
         {
             return {filterText: '',
-                    aisles: []};
+                    aisles: StoreStore.getAislesForCurrentStore()};
         },
 
         onChange: function()
@@ -35,14 +36,20 @@ module.exports = React.createClass(
         
         componentWillMount: function()
         {
-            //AisleStore.addChangeListener(this.onChange);
+            StoreStore.addChangeListener(this.onChange);
+        },
+
+        componentWillUnmount: function()
+        {
+            StoreStore.removeChangeListener(this.onChange);
         },
         
         render: function()
         {
-            return (<div>
+            // FIXME: store is not always home!
+            return (<div className="vertical_layout vertical_fill">
                     <SearchBox filterText={this.state.filterText} redoSearch={this.redoSearch}/>
-                    <AisleTable model={this.state.items} filterText={this.state.filterText} redoSearch={this.redoSearch}/>
+                    <AisleTable aisles={this.state.aisles} filterText={this.state.filterText} redoSearch={this.redoSearch} store="home" item={this.props.item} className="horizontal_fill vertical_fill"/> 
                     </div>);
         }
     });
