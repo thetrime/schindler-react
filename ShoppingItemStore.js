@@ -3,7 +3,10 @@ var assign = require('object-assign');
 var EventEmitter = require('events').EventEmitter;
 var ServerConnection = require('./ServerConnection');
 var StoreStore = require('./StoreStore');
+var SchindlerStore = require('./SchindlerStore');
 var items = [];
+var pending_item = {};
+
 
 var ShoppingItemStore = assign({},
                                EventEmitter.prototype,
@@ -34,10 +37,16 @@ function setItems(i)
     items = [];
     i.forEach(function(item)              
               {
-                  var new_item = {name:item.name,
-                                  location:StoreStore.getAisleFor(item.name)};
-                  items.push(new_item);
+                  addItem(item);
               });
+}
+
+function addItem(item)
+{
+    var new_item = {name:item.name,
+                    location:StoreStore.getAisleFor(item.name)};
+    items.push(new_item);
+
 }
 
 ShoppingItemStore.dispatchToken = AppDispatcher.register(function(event)
@@ -61,19 +70,38 @@ ShoppingItemStore.dispatchToken = AppDispatcher.register(function(event)
                                                                  // Though also actually send the message!
                                                                  ServerConnection.sendMessage(event);
                                                              }
+                                                             if (event.operation == "got_item" && event.data.location == "unknown")
+                                                             {
+                                                                 // We need to wait for the user to select a store. SchindlerStore will change the view
+                                                                 pending_item = event.data;                                                                 
+                                                             }
+                                                             if (event.operation == "set_pending_item_location")
+                                                             {
+                                                                 // Ok, they have selected an aisle. Put it on the pending item, add it to the list
+                                                                 AppDispatcher.waitFor([SchindlerStore.dispatchToken]);
+                                                                 items = items.filter(function(a) { return a.name != pending_item.name });
+                                                                 ShoppingItemStore.emitChange();
+                                                                 ServerConnection.sendMessage({operation:"set_item_location",
+                                                                                               data:{item:pending_item.name,
+                                                                                                     location: event.data.location.name,
+                                                                                                     store:'home'}});
+                                                                 ServerConnection.sendMessage({operation:"got_item",
+                                                                                               data:{name:pending_item.name}});
+                                                                 
+                                                             }                                                          
                                                              if (event.operation == "delete_item")
                                                              {
                                                                  // The server wants us to remove an item
                                                                  items = items.filter(function(a) { return a.name != event.data.name });
                                                                  ShoppingItemStore.emitChange();
                                                              }
-                                                             if (event.operation == "add_item")
+                                                             if (event.operation == "add_list_item")
                                                              {
                                                                  // The server wants us to add an item
                                                                  var found = false;
                                                                  for (var i = 0; i < items.length; i++)
                                                                  {
-                                                                     if ((items[i].name == event.data.name) && (items[i].location == event.data.location))
+                                                                     if (items[i].name == event.data.name)
                                                                      {
                                                                          found = true;
                                                                          break;
@@ -81,8 +109,8 @@ ShoppingItemStore.dispatchToken = AppDispatcher.register(function(event)
                                                                  }
                                                                  if (!found)
                                                                  {
-                                                                     console.log("Adding item " + event.data);
-                                                                     items = items.concat([event.data]);
+                                                                     console.log("Adding item " + event.data.name);
+                                                                     addItem(event.data);
                                                                      ShoppingItemStore.emitChange();                                                                     
                                                                  }
                                                                  else
@@ -95,7 +123,7 @@ ShoppingItemStore.dispatchToken = AppDispatcher.register(function(event)
                                                                  // We want to add an item
                                                                  // First, add it locally
                                                                  console.log("Adding " + event.data);
-                                                                 items = items.concat([event.data]);
+                                                                 addItem(event.data);
                                                                  ShoppingItemStore.emitChange();
                                                                  // then tell the server
                                                                  ServerConnection.sendMessage(event);

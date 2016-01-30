@@ -15,7 +15,6 @@ http:location(schindler, '/schindler', []).
 :- http_handler(schindler(.), http_reply_from_files('.', [indexes(['schindler.html'])]), [prefix]).
 
 
-:-dynamic(list_item/1).
 :-dynamic(listener/2).
 
 ws(Websocket):-
@@ -98,11 +97,22 @@ handle_message(Class, want_item, Message):-
         assert(list_item(Name)),
         ws_send_message(Class, add_list_item, _{name:Name}).
 
+handle_message(Class, set_item_location, Message):-
+        Item = Message.item,
+        Location = Message.location,
+        Store = Message.store,
+        retractall(known_item_location(Item, Store, Location)),
+        assert(known_item_location(Item, Store, Location)),
+        ws_send_message(Class, set_item_location, Message).
 
 
 
 
-
+:-dynamic(list_item/1).
+:-dynamic(store/1).
+:-dynamic(aisle/2).
+:-dynamic(item/1).
+:-dynamic(known_item_location/3).
 
 
 list_item(apple).
@@ -167,6 +177,8 @@ known_item_location(apple, home, lounge).
 
 known_item_location(orange, qfc, produce).
 known_item_location(orange, tesco, produce).
+
+known_item_location(pillow, home, bathroom).
 
 item_location(Item, Store, Aisle):-
         known_item_location(Item, Store, Aisle).

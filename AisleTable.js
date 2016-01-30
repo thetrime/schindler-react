@@ -6,16 +6,11 @@ var Item = require('./Item');
 
 module.exports = React.createClass(
     {       
-        addAisle: function(name)
+        selectAisle: function(aisle)
         {
-            AppDispatcher.dispatch({operation:"new_aisle",
-                                    data:{name:name,
+            AppDispatcher.dispatch({operation:"set_pending_item_location",
+                                    data:{location:aisle,
                                           store:this.props.store}});
-
-            this.props.redoSearch('');
-        },
-        setAisle: function(name)
-        {
         },
         render: function()
         {
@@ -24,12 +19,12 @@ module.exports = React.createClass(
             var exactMatch = false;
             if (filter != '' && !exactMatch)
             {
-                rows.push(<NewItem name={filter} key={filter} addItem={this.addAisle}/>);
+                rows.push(<NewItem name={filter} key={filter} addItem={this.selectAisle} label="Add New Aisle"/>);
             }
             var table = this;
             this.props.aisles.sort().forEach(function(aisle)
                                              {
-                                                 rows.push(<Item item={aisle} key={aisle.name} gotItem={table.setAisle} label='Select Aisle'/>);
+                                                 rows.push(<Item item={aisle} key={aisle.name} onClick={table.selectAisle} label='Select Aisle'/>);
                                             });
             return (<div className="table_container vertical_fill">
                     <table className="item_table">

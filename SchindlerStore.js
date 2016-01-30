@@ -40,6 +40,12 @@ SchindlerStore.dispatchToken = AppDispatcher.register(function(event)
                                                               current_view = "select_aisle";
                                                               SchindlerStore.emitChange();
                                                           }
+                                                          if (event.operation == "set_pending_item_location")
+                                                          {
+                                                              current_view = "shop";
+                                                              SchindlerStore.emitChange();
+                                                          }
+                                                          
                                                       });
 
 module.exports = SchindlerStore;

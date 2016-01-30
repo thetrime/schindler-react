@@ -82,44 +82,18 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                                         });
                                                           StoreStore.emitChange();
                                                       }
-
-                                                      /*
-                                                      if (event.operation == "add_store")
+                                                      if (event.operation == "set_item_location")
                                                       {
-                                                          // The server wants us to add a new store
-                                                          var found = false;
-                                                          for (var i = 0; i < stores.length; i++)
+                                                          console.log("Setting " + event.data.item + " location to " + event.data.location);
+                                                          for (var i = 0; i < world.length; i++)
                                                           {
-                                                              if ((stores[i].name == event.data.name))
+                                                              if (world[i].store_name == event.data.store)
                                                               {
-                                                                  // FIXME: Should also try to reconcile aisles in the store, I guess?
-                                                                  found = true;
-                                                                  break;
+                                                                  world[i].item_locations[event.data.item] = event.data.location;
                                                               }
                                                           }
-                                                          if (!found)
-                                                          {
-                                                              console.log("Adding item " + event.data);
-                                                              stores = stores.concat([event.data]);
-                                                              StoreStore.emitChange();                                                                     
-                                                          }
-                                                          else
-                                                          {
-                                                              console.log("Already have " + event.data);
-                                                          }
-                                                      }
-                                                      if (event.operation == "new_store")
-                                                      {
-                                                          // We want to add an store
-                                                          // First, add it locally
-                                                          console.log("Adding " + event.data);
-                                                          stores = stores.concat([event.data]);
                                                           StoreStore.emitChange();
-                                                          // then tell the server
-                                                          ServerConnection.sendMessage(event);
-                                                      }                                                      
-                                                      */
-                                                      
+                                                      }
                                                   });
 
 module.exports = StoreStore;

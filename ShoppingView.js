@@ -45,6 +45,11 @@ module.exports = React.createClass(
         {
             ShoppingItemStore.addChangeListener(this.onChange);
         },
+
+        componentWillUnmount: function()
+        {
+            ShoppingItemStore.removeChangeListener(this.onChange);
+        },
         
         render: function()
         {
