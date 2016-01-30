@@ -2,7 +2,6 @@ var AppDispatcher = require('./AppDispatcher');
 var assign = require('object-assign');
 var EventEmitter = require('events').EventEmitter;
 var ServerConnection = require('./ServerConnection');
-var StoreStore = require('./StoreStore');
 var items = [];
 
 var ShoppingItemStore = assign({},
@@ -29,27 +28,12 @@ var ShoppingItemStore = assign({},
                                    
                                });
 
-function setItems(i)
-{
-    items = [];
-    i.forEach(function(item)              
-              {
-                  var new_item = {name:item.name,
-                                  location:StoreStore.getAisleFor(item.name)};
-                  items.push(new_item);
-              });
-}
-
 ShoppingItemStore.dispatchToken = AppDispatcher.register(function(event)
                                                          {
-                                                             if (event.operation == "hello")
+                                                             if (event.operation == "list")
                                                              {
                                                                  // This is a complete update from the server. We only get this when we send a "hello" message
-                                                                 // But we must wait for the world view to be loaded first
-                                                                 AppDispatcher.waitFor([StoreStore.dispatchToken]);
-                                                                 // Then we load in the list
-                                                                 // and configure the list item locations
-                                                                 setItems(event.data.list);
+                                                                 items = event.data.items;
                                                                  ShoppingItemStore.emitChange();
                                                              }
                                                              if (event.operation == "got_item" && event.data.location != "unknown")

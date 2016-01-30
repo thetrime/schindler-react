@@ -11,9 +11,7 @@ module.exports = React.createClass(
         {
             AppDispatcher.dispatch({operation:"new_item",
                                     data:{name:name,
-                                         location:"unknown"}});
-            //ServerConnection.sendMessage({operation:"new_item",
-            //                              data:{name:name}});
+                                          location:"unknown"}});
             this.props.redoSearch('');
         },
         render: function()
@@ -44,7 +42,7 @@ module.exports = React.createClass(
                                rows.push(<Location key={groups[group].location} location={groups[group].location}/>);
                                groups[group].items.forEach(function(item)
                                                            {
-                                                               rows.push(<Item item={item} key={item.name} gotItem={table.gotItem}/>);
+                                                               rows.push(<Item item={item} key={item.name} gotItem={table.gotItem} label="Got It!"/>);
                                                            });
                            });
             return (<div className="table_container vertical_fill">
