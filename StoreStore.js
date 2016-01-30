@@ -91,8 +91,11 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                               {
                                                                   world[i].item_locations[event.data.item] = event.data.location;
                                                               }
-                                                          }
+                                                          }                                                          
                                                           StoreStore.emitChange();
+                                                          // Also advise the server of this realization
+                                                          if (event.origin == 'client')
+                                                              ServerConnection.sendMessage(event);
                                                       }
                                                   });
 

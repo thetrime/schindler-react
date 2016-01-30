@@ -49,7 +49,7 @@ module.exports = React.createClass(
             // FIXME: store is not always home!
             return (<div className="vertical_layout vertical_fill">
                     <SearchBox filterText={this.state.filterText} redoSearch={this.redoSearch}/>
-                    <AisleTable aisles={this.state.aisles} filterText={this.state.filterText} redoSearch={this.redoSearch} store="home" className="horizontal_fill vertical_fill"/> 
+                    <AisleTable aisles={this.state.aisles} filterText={this.state.filterText} redoSearch={this.redoSearch} store="home" item={this.props.item} className="horizontal_fill vertical_fill"/> 
                     </div>);
         }
     });

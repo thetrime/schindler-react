@@ -5,7 +5,6 @@ var ServerConnection = require('./ServerConnection');
 var StoreStore = require('./StoreStore');
 var SchindlerStore = require('./SchindlerStore');
 var items = [];
-var pending_item = {};
 
 
 var ShoppingItemStore = assign({},
@@ -69,26 +68,7 @@ ShoppingItemStore.dispatchToken = AppDispatcher.register(function(event)
                                                                  ShoppingItemStore.emitChange();
                                                                  // Though also actually send the message!
                                                                  ServerConnection.sendMessage(event);
-                                                             }
-                                                             if (event.operation == "got_item" && event.data.location == "unknown")
-                                                             {
-                                                                 // We need to wait for the user to select a store. SchindlerStore will change the view
-                                                                 pending_item = event.data;                                                                 
-                                                             }
-                                                             if (event.operation == "set_pending_item_location")
-                                                             {
-                                                                 // Ok, they have selected an aisle. Put it on the pending item, add it to the list
-                                                                 AppDispatcher.waitFor([SchindlerStore.dispatchToken]);
-                                                                 items = items.filter(function(a) { return a.name != pending_item.name });
-                                                                 ShoppingItemStore.emitChange();
-                                                                 ServerConnection.sendMessage({operation:"set_item_location",
-                                                                                               data:{item:pending_item.name,
-                                                                                                     location: event.data.location.name,
-                                                                                                     store:'home'}});
-                                                                 ServerConnection.sendMessage({operation:"got_item",
-                                                                                               data:{name:pending_item.name}});
-                                                                 
-                                                             }                                                          
+                                                             }                                       
                                                              if (event.operation == "delete_item")
                                                              {
                                                                  // The server wants us to remove an item
@@ -120,7 +100,7 @@ ShoppingItemStore.dispatchToken = AppDispatcher.register(function(event)
                                                              }
                                                              if (event.operation == "new_item")
                                                              {
-                                                                 // We want to add an item
+                                                                 // The user wants to add an item
                                                                  // First, add it locally
                                                                  console.log("Adding " + event.data);
                                                                  addItem(event.data);

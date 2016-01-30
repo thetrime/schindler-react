@@ -11,7 +11,8 @@ module.exports = React.createClass(
     {
         getInitialState: function()
         {
-            return {currentView: SchindlerStore.getTopLevelView()};
+            return {currentView: SchindlerStore.getTopLevelView(),
+                    pending_item: {}};
         },
 
         render: function()
@@ -25,7 +26,7 @@ module.exports = React.createClass(
             else if (this.state.currentView == "select_aisle")
                 return (<div className="vertical_layout vertical_fill">
                         <ShopName/>
-                        <AisleView/>
+                        <AisleView item={this.state.pending_item}/>
                         <ConnectionInfo/>
                         </div>);
         },
@@ -37,7 +38,8 @@ module.exports = React.createClass(
 
         onChange: function()
         {
-            this.setState({currentView: SchindlerStore.getTopLevelView()});
+            this.setState({currentView: SchindlerStore.getTopLevelView(),
+                           pending_item: SchindlerStore.getPendingItem()});
         }
         
     });
