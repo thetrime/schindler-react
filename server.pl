@@ -6,13 +6,9 @@
 
 :-ensure_loaded(testing).
 
-:- multifile http:location/3.
-:- dynamic   http:location/3.
-http:location(schindler, '/schindler', []).
 
-
-:- http_handler(schindler(ws), http_upgrade_to_websocket(ws, []), [spawn([])]).
-:- http_handler(schindler(.), http_reply_from_files('.', [indexes(['schindler.html'])]), [prefix]).
+:- http_handler(root(ws), http_upgrade_to_websocket(ws, []), [spawn([])]).
+:- http_handler(root(.), http_reply_from_files('.', [indexes(['schindler.html'])]), [prefix]).
 
 
 :-dynamic(listener/2).
