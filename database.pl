@@ -66,8 +66,9 @@ delete(Connection, list_item(Key, Name)):-
         setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM list_item WHERE key = ? AND name = ?', [default, default], Statement, []),
                            odbc_execute(Statement, [Key, Name], _),
                            odbc_free_statement(Statement)).
+
 delete(Connection, known_item_location(Key, Item, Store, Location)):-
-        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO known_item_location WHERE key = ? AND item = ? AND store = ? AND location = ?', [default, default, default, default], Statement, []),
+        setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM known_item_location WHERE key = ? AND item = ? AND store = ? AND location = ?', [default, default, default, default], Statement, []),
                            odbc_execute(Statement, [Key, Item, Store, Location], _),
                            odbc_free_statement(Statement)).        
 
