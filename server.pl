@@ -5,6 +5,7 @@
 :- use_module(library(http/json)).
 
 :-ensure_loaded(testing).
+:-ensure_loaded(database).
 
 
 :- http_handler(root(ws), http_upgrade_to_websocket(ws, []), [spawn([])]).
@@ -30,7 +31,8 @@ client(ClientId, Class, WebSocket) :-
             Data = Message.data,
             Operation = Data.operation,
             Fields = Data.data,
-            ( catch(handle_message(Class, Operation, Fields),
+            Key = matt, % FIXME
+            ( catch(handle_message(Key, Class, Operation, Fields),
                     Exception,
                     format(user_error, 'Error: ~p~n', [Exception]))->
                 true
@@ -64,141 +66,71 @@ dispatch(WebSocket):-
         ).
 
 run:-
+        prepare_database,
         http_server(http_dispatch, [port(9999)]).
 
 %-------------------------------------
 
-handle_message(Class, hello, _):-
-        Key = fixme,
-        Checkpoint = fixme,
+handle_message(Key, Class, hello, Message):-
+        Checkpoint = Message.checkpoint,
         world_information(Key, Checkpoint, World),
         list_information(Key, Checkpoint, List),
         ws_send_message(Class, hello, _{world:World,
                                         list:List}).
 
-handle_message(Class, got_item, Message):-
+handle_message(Key, Class, got_item, Message):-
         Name = Message.name,
-        retractall(list_item(Name)),
+        transaction(Key, Connection, delete(Connection, list_item(Key, Name))),
         ws_send_message(Class, delete_item, _{name:Name}).
 
-handle_message(Class, new_item, Message):-
+handle_message(Key, Class, new_item, Message):-
         Name = Message.name,
-        assert(item(Name)),
-        assert(list_item(Name)),
+        transaction(Key,
+                    Connection,
+                    ( insert(Connection, item(Key, Name)),
+                      insert(Connection, list_item(Key, Name)))),
         ws_send_message(Class, add_list_item, _{name:Name}).
 
 
-handle_message(Class, want_item, Message):-
+handle_message(Key, Class, want_item, Message):-
         Name = Message.name,
-        assert(list_item(Name)),
+        transaction(Key, Connection, insert(Connection, list_item(Key, Name))),
         ws_send_message(Class, add_list_item, _{name:Name}).
 
-handle_message(Class, set_item_location, Message):-
+handle_message(Key, Class, set_item_location, Message):-
         Item = Message.item,
         Location = Message.location,
         Store = Message.store,
-        retractall(known_item_location(Item, Store, Location)),
-        assert(known_item_location(Item, Store, Location)),
+        transaction(Key,
+                    Connection,
+                    ( delete(Connection, known_item_location(Key, Item, Store, Location)),
+                      insert(Connection, known_item_location(Key, Item, Store, Location)))),
         ws_send_message(Class, set_item_location, Message).
 
 
+world_information(Key, _, Data):-
+        ( bagof(x{store_name:Store,
+                  aisles:Aisles},
+                bagof(y{aisle_name:Aisle,
+                        items:Items},
+                      bagof(Item,
+                            item_location(Key, Item, Store, Aisle),
+                            Items),
+                      Aisles),
+                Data)
+        ; otherwise->
+            Data = []
+        ).
 
 
-:-dynamic(list_item/1).
-:-dynamic(store/1).
-:-dynamic(aisle/2).
-:-dynamic(item/1).
-:-dynamic(known_item_location/3).
-
-
-list_item(apple).
-list_item(orange).
-list_item(guitar).
-list_item(banjo).
-list_item(soap).
-list_item(chutney).
-list_item('fish paste').
-list_item(gruel).
-list_item(boxes).
-list_item(apes).
-list_item(trampoline).
-list_item(floor).
-list_item('old timey jig').
-list_item(banana).
-list_item(guava).
-list_item(peach).
-list_item(durian).
-list_item(mango).
-list_item(worms).
-
-
-store(home).
-store(tesco).
-store(qfc).
-
-aisle(home, lounge).
-aisle(home, kitchen).
-aisle(home, bathroom).
-aisle(home, bedroom).
-
-aisle(qfc, produce).
-aisle(tesco, produce).
-
-item(apple).
-item(orange).
-item(guitar).
-item(banjo).
-item(soap).
-item(chutney).
-item('fish paste').
-item(gruel).
-item(pillow).
-item(boxes).
-item(apes).
-item(trampoline).
-item(curtains).
-item(floor).
-item('old timey jig').
-item(clocks).
-item(banana).
-item(guava).
-item(peach).
-item(durian).
-item(mango).
-item(worms).
-
-known_item_location(apple, qfc, produce).
-known_item_location(apple, tesco, produce).
-known_item_location(apple, home, lounge).
-
-known_item_location(orange, qfc, produce).
-known_item_location(orange, tesco, produce).
-
-known_item_location(pillow, home, bathroom).
-
-item_location(Item, Store, Aisle):-
-        known_item_location(Item, Store, Aisle).
-
-item_location(Item, Store, unknown):-
-        item(Item),
-        store(Store),
-        \+known_item_location(Item, Store, _).
-
-world_information(_, _, Data):-
-        bagof(x{store_name:Store,
-                aisles:Aisles},
-              bagof(y{aisle_name:Aisle,
-                      items:Items},
-                    bagof(Item,
-                          item_location(Item, Store, Aisle),
-                          Items),
-                    Aisles),
-              Data).
-
-list_information(_, _, Data):-
-        bagof(x{name:Name},
-              list_item(Name),
-              Data).
+list_information(Key, _, Data):-
+        ( bagof(x{name:Name},
+                list_item(Key, Name),
+                Data)->
+            true
+        ; otherwise->
+            Data = []
+        ).
 
 
 % This is quite inefficient. We report that every item we know is in the unknown aisle for every store. It might be better to optimise that out

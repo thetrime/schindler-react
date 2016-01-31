@@ -14,7 +14,6 @@ ReactDOM.render(<div className="root vertical_layout">
 
 /* To do list:
    * Restructure to use Flux, now that I understand data flow
-   * Store list in database
    * Geolocation for store (and ability to change store)
    * Undo
    * Details screen for items

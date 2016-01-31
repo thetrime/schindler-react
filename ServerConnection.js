@@ -6,7 +6,11 @@ module.exports =
         websocket: null,
         handle_server_connect: function()
         {
-            this.sendMessage({operation:"hello",data:{version:1}});
+            var checkpoint = localStorage.getItem("checkpoint");
+            if (checkpoint === undefined)
+                checkpoint = [];
+            this.sendMessage({operation:"hello",data:{version:1,
+                                                      checkpoint:checkpoint}});
             this.dispatchEvent("connection", "connected");
             this.dispatchQueuedMessages();
         },
