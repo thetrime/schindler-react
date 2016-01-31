@@ -19,14 +19,10 @@ ReactDOM.render(<div className="root vertical_layout">
    * Details screen for items
    * Defer mode and relocate mode.
    * Multiple users
+   * Gzip large items
    * Native version :P
 
-I *think* that state is something that must be preserved between renders. Things like: The value in an input which a user has started typing?
-
-I think I need a more complicated thing for my websocket; something you can subscribe to events on (like onClose), and subscribe to messages with a particular tag.
-Then I can pass this thing around as a property. Components can listen for events on it and call setState() as needed.
-
-I should then add on componentDidMount, and remove it on componentDidUmount
-
+Bugs:
+   * I think an aisle with no items will never be represented at a store
 
 */

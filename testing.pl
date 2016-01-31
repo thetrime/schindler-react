@@ -2,6 +2,9 @@
 :-op(920, fy, ?).
 :-op(920, fy, ??).
 
+:-meta_predicate(??(0)).
+:-meta_predicate(?(0)).
+
 ??(Goal):-
         setup_call_catcher_cleanup(format(user_error, 'CALL ~q~n', [Goal]),
                                    Goal,

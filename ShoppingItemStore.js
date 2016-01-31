@@ -51,7 +51,7 @@ function addItem(item)
 
 ShoppingItemStore.dispatchToken = AppDispatcher.register(function(event)
                                                          {
-                                                             if (event.operation == "hello")
+                                                             if (event.operation == "ohai")
                                                              {
                                                                  // This is a complete update from the server. We only get this when we send a "hello" message
                                                                  // But we must wait for the world view to be loaded first

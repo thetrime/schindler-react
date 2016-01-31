@@ -3,6 +3,8 @@
           insert/2,
           delete/2,
           item_location/4,
+          store/2,
+          item/2,
           list_item/2,
           transaction/3]).
 
@@ -73,30 +75,45 @@ delete(Connection, known_item_location(Key, Item, Store, Location)):-
                            odbc_free_statement(Statement)).        
 
 item_location(Key, Item, Store, Aisle):-
-        get_connection(Connection),
-        findall(Row,
-                setup_call_cleanup(odbc_prepare(Connection, 'SELECT item, store, location FROM known_item_location WHERE key = ?', [default], Statement, []),
-                                   odbc_execute(Statement, [Key], Row),
-                                   odbc_free_statement(Statement)),
-                Rows),
+        select(Connection,
+               findall(Row,
+                       setup_call_cleanup(odbc_prepare(Connection, 'SELECT item, store, location FROM known_item_location WHERE key = ?', [default], Statement, []),
+                                          odbc_execute(Statement, [Key], Row),
+                                          odbc_free_statement(Statement)),
+                       Rows)),
         member(row(Item, Store, Aisle), Rows).
 
-item_location(Key, Item, Store, unknown):-
-        % Yuck :(
-        get_connection(Connection),
-        findall(Row,
-                setup_call_cleanup(odbc_prepare(Connection, 'SELECT i.name, s.name FROM item i CROSS JOIN store s WHERE NOT EXISTS (SELECT 1 FROM known_item_location k WHERE k.store = s.name AND k.item = i.name) AND s.key = ? AND i.key = ?', [default, default], Statement, []),
-                                   odbc_execute(Statement, [Key, Key], Row),
-                                   odbc_free_statement(Statement)),
-                Rows),
-        memberchk(row(Item, Store), Rows).
+item(Key, Item):-
+        select(Connection,
+               findall(Row,
+                       setup_call_cleanup(odbc_prepare(Connection, 'SELECT name FROM item WHERE key = ?', [default], Statement, []),
+                                          odbc_execute(Statement, [Key], Row),
+                                          odbc_free_statement(Statement)),
+                       Rows)),
+        member(row(Item), Rows).
+
+store(Key, Store):-
+        select(Connection,
+               findall(Row,
+                       setup_call_cleanup(odbc_prepare(Connection, 'SELECT name FROM store WHERE key = ?', [default], Statement, []),
+                                          odbc_execute(Statement, [Key], Row),
+                                          odbc_free_statement(Statement)),
+                       Rows)),
+        member(row(Store), Rows).
 
 list_item(Key, Item):-
-        get_connection(Connection),
-        setup_call_cleanup(odbc_prepare(Connection, 'SELECT name FROM list_item WHERE key = ?', [default], Statement, []),
-                           odbc_execute(Statement, [Key], row(Item)),
-                           odbc_free_statement(Statement)).
+        select(Connection,
+               setup_call_cleanup(odbc_prepare(Connection, 'SELECT name FROM list_item WHERE key = ?', [default], Statement, []),
+                                  odbc_execute(Statement, [Key], row(Item)),
+                                  odbc_free_statement(Statement))).
 
+
+:-meta_predicate(select(?, 0)).
+select(Connection, Goal):-        
+        setup_call_cleanup(get_connection(Connection),
+                           Goal,
+                           odbc_end_transaction(Connection, rollback)).
+        
 get_connection(Connection):-
         with_mutex(connection_mutex,
                    get_connection_1(Connection)).

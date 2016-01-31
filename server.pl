@@ -74,10 +74,14 @@ run:-
 
 handle_message(Key, Class, hello, Message):-
         Checkpoint = Message.checkpoint,
-        world_information(Key, Checkpoint, World),
+        location_information(Key, Checkpoint, Locations),
+        store_information(Key, Checkpoint, Stores),
+        item_information(Key, Checkpoint, Items),
         list_information(Key, Checkpoint, List),
-        ws_send_message(Class, hello, _{world:World,
-                                        list:List}).
+        ws_send_message(Class, ohai, _{stores:Stores,
+                                       item_locations:Locations,
+                                       items:Items,
+                                       list:List}).
 
 handle_message(Key, Class, got_item, Message):-
         Name = Message.name,
@@ -109,7 +113,16 @@ handle_message(Key, Class, set_item_location, Message):-
         ws_send_message(Class, set_item_location, Message).
 
 
-world_information(Key, _, Data):-
+item_information(Key, _, Items):-
+        ( bagof(x{name:Name},
+                item(Key, Name),
+                Items)->
+            true
+        ; otherwise->
+            Items = []
+        ).
+
+location_information(Key, _, Locations):-
         ( bagof(x{store_name:Store,
                   aisles:Aisles},
                 bagof(y{aisle_name:Aisle,
@@ -118,15 +131,24 @@ world_information(Key, _, Data):-
                             item_location(Key, Item, Store, Aisle),
                             Items),
                       Aisles),
-                Data)
+                Locations)
         ; otherwise->
-            Data = []
+            Locations = []
         ).
 
 
 list_information(Key, _, Data):-
         ( bagof(x{name:Name},
                 list_item(Key, Name),
+                Data)->
+            true
+        ; otherwise->
+            Data = []
+        ).
+
+store_information(Key, _, Data):-
+        ( bagof(x{name:Name},
+                store(Key, Name),
                 Data)->
             true
         ; otherwise->

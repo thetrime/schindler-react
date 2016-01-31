@@ -8,7 +8,7 @@ module.exports =
         {
             var checkpoint = localStorage.getItem("checkpoint");
             if (checkpoint === undefined)
-                checkpoint = [];
+                checkpoint = null;
             this.sendMessage({operation:"hello",data:{version:1,
                                                       checkpoint:checkpoint}});
             this.dispatchEvent("connection", "connected");
