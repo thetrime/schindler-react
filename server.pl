@@ -67,6 +67,7 @@ dispatch(WebSocket):-
 
 run:-
         prepare_database,
+        prolog_server(9998, []),
         http_server(http_dispatch, [port(9999)]).
 
 %-------------------------------------

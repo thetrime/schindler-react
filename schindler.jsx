@@ -19,7 +19,6 @@ ReactDOM.render(<div className="root vertical_layout">
    * Details screen for items
    * Defer mode and relocate mode.
    * Multiple users
-   * Prolog backdoor listening for connections from localhost only, for talking to the server in headless mode
    * Native version :P
 
 I *think* that state is something that must be preserved between renders. Things like: The value in an input which a user has started typing?
