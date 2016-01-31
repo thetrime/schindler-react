@@ -15,18 +15,12 @@ ReactDOM.render(<div className="root vertical_layout">
 /* To do list:
    * Restructure to use Flux, now that I understand data flow
    * Store list in database
-   * Geolocation for store
-   * Configure location if unknown when purchased
-   * Maintenance screen for items
-   * Maintenance screen for stores
+   * Geolocation for store (and ability to change store)
    * Undo
    * Details screen for items
    * Defer mode and relocate mode.
    * Multiple users
-   * Offline mode?
-      * Queue messages for delivery to server
-      * All messages must therefore be relative; applied in different orders?
-      * Need to keep some state on the client then (the queued messages plus the current state)
+   * Prolog backdoor listening for connections from localhost only, for talking to the server in headless mode
    * Native version :P
 
 I *think* that state is something that must be preserved between renders. Things like: The value in an input which a user has started typing?
