@@ -59,8 +59,27 @@ var StoreStore = assign({},
                                     }
                                 }
                                 return aisles;
+                            },
+
+                            getItemsForCurrentStore: function()
+                            {
+                                var items = [];
+                                for (var i = 0; i < world.length; i++)
+                                {
+                                    if (world[i].store_name == current_store)
+                                    {
+                                        world[i].aisles.forEach(function(aisle)
+                                                                {
+                                                                    aisle.items.forEach(function(item)
+                                                                                        {
+                                                                                            items.push({name:item,
+                                                                                                        location:aisle.aisle_name});
+                                                                                        });
+                                                                });
+                                    }
+                                }
+                                return items;
                             }
-                            
                         });
 
 StoreStore.dispatchToken = AppDispatcher.register(function(event)

@@ -43,6 +43,7 @@ function setItems(i)
 function addItem(item)
 {
     var new_item = {name:item.name,
+                    on_list:true,
                     location:StoreStore.getAisleFor(item.name)};
     items.push(new_item);
 
@@ -103,6 +104,15 @@ ShoppingItemStore.dispatchToken = AppDispatcher.register(function(event)
                                                                  // The user wants to add an item
                                                                  // First, add it locally
                                                                  console.log("Adding " + event.data);
+                                                                 addItem(event.data);
+                                                                 ShoppingItemStore.emitChange();
+                                                                 // then tell the server
+                                                                 ServerConnection.sendMessage(event);
+                                                             }
+                                                             if (event.operation == "want_item")
+                                                             {
+                                                                 // The user wants to add an existing item
+                                                                 // First, add it locally
                                                                  addItem(event.data);
                                                                  ShoppingItemStore.emitChange();
                                                                  // then tell the server
