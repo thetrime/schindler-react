@@ -103,6 +103,10 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                           if (event.origin == 'client')
                                                               ServerConnection.sendMessage(event);
                                                       }
+                                                      if (event.operation == "login")
+                                                      {
+                                                          ServerConnection.sendMessage(event);
+                                                      }
                                                   });
 
 module.exports = StoreStore;

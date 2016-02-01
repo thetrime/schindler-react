@@ -3,6 +3,7 @@
 :- use_module(library(http/http_dispatch)).
 :- use_module(library(http/http_files)).
 :- use_module(library(http/json)).
+:- use_module(library(http/http_session)).
 
 :-ensure_loaded(testing).
 :-ensure_loaded(database).
@@ -19,9 +20,9 @@ ws(Websocket):-
         Class = foo,
         thread_create(dispatch(Websocket), ClientId, [detached(true)]),
         assert(listener(Class, ClientId)),
-        client(ClientId, Class, Websocket).
+        client(ClientId, Class, Websocket, {null}).
 
-client(ClientId, Class, WebSocket) :-
+client(ClientId, Class, WebSocket, Key) :-
         format(user_error, 'Waiting for message...~n', []),
         ws_receive(WebSocket, Message, [format(json), value_string_as(atom)]),
         format(user_error, 'Message: ~q~n', [Message]),
@@ -31,17 +32,23 @@ client(ClientId, Class, WebSocket) :-
             Data = Message.data,
             Operation = Data.operation,
             Fields = Data.data,
-            Key = matt, % FIXME
-            ( catch(handle_message(Key, Class, Operation, Fields),
-                    Exception,
-                    format(user_error, 'Error: ~p~n', [Exception]))->
-                true
+            ( Operation == login->
+                % This is slightly different logic
+                login(Fields, NewKey),
+                ws_send_message(Class, login_ok, _{key:NewKey})
             ; otherwise->
-                format(user_error, 'Error: ~p~n', [fail])
+                NewKey = Key,
+                ( catch(handle_message(Key, Class, Operation, Fields),
+                        Exception,
+                        format(user_error, 'Error: ~p~n', [Exception]))->
+                    true
+                ; otherwise->
+                    format(user_error, 'Error: ~p~n', [fail])
+                )
             ),
-            client(ClientId, Class, WebSocket)
+            client(ClientId, Class, WebSocket, NewKey)
         ; otherwise->
-            client(ClientId, Class, WebSocket)
+            client(ClientId, Class, WebSocket, Key)
         ).
 
 ws_send_message(Class, Key, Data):-
@@ -71,6 +78,9 @@ run:-
         http_server(http_dispatch, [port(9999)]).
 
 %-------------------------------------
+
+login(Fields, Key):-
+        Key = Fields.username.
 
 handle_message(Key, Class, hello, Message):-
         Checkpoint = Message.checkpoint,

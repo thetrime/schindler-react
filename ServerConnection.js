@@ -6,11 +6,16 @@ module.exports =
         websocket: null,
         handle_server_connect: function()
         {
-            var checkpoint = localStorage.getItem("checkpoint");
-            if (checkpoint === undefined)
-                checkpoint = null;
-            this.sendMessage({operation:"hello",data:{version:1,
-                                                      checkpoint:checkpoint}});
+            var credentials = JSON.parse(localStorage.getItem("credentials"));
+            if (credentials !== null && credentials !== undefined)
+            {
+                this.sendMessage({operation:"login",
+                                  data:credentials});
+            }
+            else
+            {
+                this.reloadList();
+            }
             this.dispatchEvent("connection", "connected");
             this.dispatchQueuedMessages();
         },
@@ -62,6 +67,14 @@ module.exports =
             var msg = JSON.parse(event.data);
             this.dispatchEvent(msg.operation, msg.data);
         },
+        
+        reloadList: function()
+        {
+            var checkpoint = localStorage.getItem("checkpoint");
+            this.sendMessage({operation:"hello", data:{version:1,
+                                                       checkpoint:checkpoint}});
+        },
+        
         initialize: function()
         {
             var loc = window.location;

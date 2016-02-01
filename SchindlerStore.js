@@ -1,8 +1,9 @@
 var AppDispatcher = require('./AppDispatcher');
 var assign = require('object-assign');
 var EventEmitter = require('events').EventEmitter;
+var ServerConnection = require('./ServerConnection');
 
-var current_view = "shop";
+var current_view = "login";
 var current_store = "home";
 var pending_item = {};
 
@@ -52,7 +53,13 @@ SchindlerStore.dispatchToken = AppDispatcher.register(function(event)
                                                               pending_item = {};
                                                               SchindlerStore.emitChange();
                                                           }
-                                                          
+                                                          if (event.operation == "login_ok")
+                                                          {
+                                                              current_view = "shop";
+                                                              localStorage.setItem("credentials", JSON.stringify({username:event.data.key}));
+                                                              SchindlerStore.emitChange();
+                                                              (ServerConnection.reloadList.bind(ServerConnection))()
+                                                          }
                                                       });
 
 module.exports = SchindlerStore;

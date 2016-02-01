@@ -6,14 +6,13 @@ var SchindlerApp = require('./SchindlerApp');
 
 ServerConnection.initialize();
 ReactDOM.render(<div className="root vertical_layout">
-                <SchindlerApp mode="shop"/>
+                <SchindlerApp mode="login"/>
                 </div>,
                 document.getElementById("container"));
 
 
 
 /* To do list:
-   * Restructure to use Flux, now that I understand data flow
    * Geolocation for store (and ability to change store)
    * Undo
    * Details screen for items
