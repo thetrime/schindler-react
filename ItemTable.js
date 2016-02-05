@@ -11,20 +11,19 @@ module.exports = React.createClass(
         addItem: function(item)
         {
             AppDispatcher.dispatch({operation:"new_item",
-                                    data:item});
+                                    data:{name:item}});
             this.props.redoSearch('');
         },
         wantItem: function(item)
         {
-            console.log(item);
             AppDispatcher.dispatch({operation:"want_item",
-                                    data:item});
+                                    data:{name:item.name}});
             this.props.redoSearch('');
         },
         gotItem: function(item)
         {
             AppDispatcher.dispatch({operation:"got_item",
-                                    data:item});
+                                    data:{name:item.name}});
         },       
         render: function()
         {
