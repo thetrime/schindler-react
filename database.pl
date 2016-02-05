@@ -2,6 +2,7 @@
          [prepare_database/0,
           insert/2,
           delete/2,
+          check_login/2,
           item_location/4,
           store/2,
           item/2,
@@ -59,6 +60,12 @@ insert(Connection, known_item_location(Key, Item, Store, Location)):-
                            odbc_execute(Statement, [Key, Item, Store, Location], _),
                            odbc_free_statement(Statement)).
 
+insert(Connection, user(Username, Password)):-
+        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO users(username, password) VALUES (?, ?)', [default, default], Statement, []),
+                           odbc_execute(Statement, [Username, Password], _),
+                           odbc_free_statement(Statement)).
+
+
 delete(Connection, item(Key, Name)):-
         setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM item WHERE key = ? AND name = ?', [default, default], Statement, []),
                            odbc_execute(Statement, [Key, Name], _),
@@ -106,6 +113,17 @@ list_item(Key, Item):-
                setup_call_cleanup(odbc_prepare(Connection, 'SELECT name FROM list_item WHERE key = ?', [default], Statement, []),
                                   odbc_execute(Statement, [Key], row(Item)),
                                   odbc_free_statement(Statement))).
+
+check_login(Username, Password):-
+        ( select(Connection,
+                 setup_call_cleanup(odbc_prepare(Connection, 'SELECT password FROM users WHERE username = ?', [default], Statement, []),
+                                    odbc_execute(Statement, [Username], row(ExpectedPassword)),
+                                    odbc_free_statement(Statement)))->
+            Password == ExpectedPassword
+        ; otherwise->
+            % New user. Just check them in
+            transaction(Username, Connection, insert(Connection, user(Username, Password)))
+        ).
 
 
 :-meta_predicate(select(?, 0)).
@@ -220,3 +238,6 @@ upgrade_schema_from(Connection, 0):-
         odbc_query(Connection, 'INSERT INTO known_item_location(key, item, store, location) VALUES(\'matt\', \'orange\', \'tesco\', \'produce\')', _),
         
         odbc_query(Connection, 'INSERT INTO known_item_location(key, item, store, location) VALUES(\'matt\', \'pillow\', \'home\', \'bathroom\')', _).
+
+upgrade_schema_from(Connection, 1):-
+        odbc_query(Connection, 'CREATE TABLE users(username VARCHAR, password VARCHAR)', _).

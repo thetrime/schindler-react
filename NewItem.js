@@ -11,7 +11,7 @@ module.exports = React.createClass(
         {
             return (<tr>
                     <td>{this.props.name}</td>
-                    <td className="button_column"><button onClick={this.addItem}>{this.props.label}</button></td>
+                    <td className="button_column"><button className="app_button" onClick={this.addItem}>{this.props.label}</button></td>
                     </tr>);
             
         }

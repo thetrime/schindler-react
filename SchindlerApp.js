@@ -7,6 +7,7 @@ var ShopName = require('./ShopName');
 var ConnectionInfo = require('./ConnectionInfo');
 var SchindlerStore = require('./SchindlerStore');
 var Login = require('./Login');
+var LoginInfo = require('./LoginInfo');
 module.exports = React.createClass(
     {
         getInitialState: function()
@@ -20,6 +21,7 @@ module.exports = React.createClass(
             if (this.state.currentView == "login")                
                 return (<div className="vertical_layout vertical_fill">
                         <Login/>
+                        <ConnectionInfo/>                        
                         </div>);
             else if (this.state.currentView == "shop")
                 return (<div className="vertical_layout vertical_fill">

@@ -6,7 +6,10 @@ module.exports =
         websocket: null,
         handle_server_connect: function()
         {
+            // FIXME: Do not commit this next line.            
+            // localStorage.setItem("credentials", null);
             var credentials = JSON.parse(localStorage.getItem("credentials"));
+            console.log(credentials);
             if (credentials !== null && credentials !== undefined)
             {
                 this.sendMessage({operation:"login",

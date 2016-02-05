@@ -34,8 +34,7 @@ client(ClientId, Class, WebSocket, Key) :-
             Fields = Data.data,
             ( Operation == login->
                 % This is slightly different logic
-                login(Fields, NewKey),
-                ws_send_message(Class, login_ok, _{key:NewKey})
+                login(Class, Fields, Key, NewKey)
             ; otherwise->
                 NewKey = Key,
                 ( catch(handle_message(Key, Class, Operation, Fields),
@@ -79,8 +78,17 @@ run:-
 
 %-------------------------------------
 
-login(Fields, Key):-
-        Key = Fields.username.
+login(Class, Fields, Key, NewKey):-
+        Username = Fields.username,
+        Password = Fields.password,
+        ( check_login(Username, Password)->
+            NewKey = Username,
+            ws_send_message(Class, login_ok, _{username:Username,
+                                               password:Password})
+        ; otherwise->
+            NewKey = Key,
+            ws_send_message(Class, login_failed, _{})
+        ).
 
 handle_message(Key, Class, hello, Message):-
         Checkpoint = Message.checkpoint,

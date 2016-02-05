@@ -14,7 +14,7 @@ th
     width: 100%;
 }
 
-button
+.app_button
 {
     float: right;
 }
@@ -82,11 +82,50 @@ html, body
 
 }
 
-.shopName
+.shop_name
 {
+    font-size: 16pt;
     text-align: center;
 }
 
+.login
+{
+    text-align: center;
+    -webkit-justify-content: center;
+    display: -webkit-flex;
+}
+
+.login_box
+{
+    border: 2px solid grey;
+    -webkit-border-radius: 15px;
+    align-self: center;
+    padding: 20px;
+    padding-top: 10px;
+}
+
+.logout_button
+{
+    x-float: right;
+}
+
+.login_parent
+{
+    -webkit-align-self: center;
+}
+
+#username_div
+{
+    text-align: left;
+    padding-bottom: 5px;
+}
+
+#password_div
+{
+    text-align: left;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
 
 
 .horizontal_layout

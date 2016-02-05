@@ -56,10 +56,22 @@ SchindlerStore.dispatchToken = AppDispatcher.register(function(event)
                                                           if (event.operation == "login_ok")
                                                           {
                                                               current_view = "shop";
-                                                              localStorage.setItem("credentials", JSON.stringify({username:event.data.key}));
+                                                              localStorage.setItem("credentials", JSON.stringify({username:event.data.username,
+                                                                                                                  password:event.data.password}));
                                                               SchindlerStore.emitChange();
                                                               (ServerConnection.reloadList.bind(ServerConnection))()
                                                           }
+                                                          if (event.operation == "login_failed")
+                                                          {
+                                                              
+                                                          }
+                                                          if (event.operation == "logout")
+                                                          {
+                                                              localStorage.setItem("credentials", null);
+                                                              current_view = "login";
+                                                              SchindlerStore.emitChange();
+                                                          }
+
                                                       });
 
 module.exports = SchindlerStore;
