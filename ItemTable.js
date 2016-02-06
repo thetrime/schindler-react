@@ -11,7 +11,7 @@ module.exports = React.createClass(
         addItem: function(item)
         {
             AppDispatcher.dispatch({operation:"new_item",
-                                    data:{name:item}});
+                                    data:{name:item.name}});
             this.props.redoSearch('');
         },
         wantItem: function(item)
@@ -23,7 +23,8 @@ module.exports = React.createClass(
         gotItem: function(item)
         {
             AppDispatcher.dispatch({operation:"got_item",
-                                    data:{name:item.name}});
+                                    data:{name:item.name,
+                                          location:item.location}});
         },       
         render: function()
         {

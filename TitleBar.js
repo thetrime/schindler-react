@@ -1,13 +1,19 @@
 var React = require('react');
 var AppDispatcher = require('./AppDispatcher');
-var SchindlerStore = require('./SchindlerStore');
+var StoreStore = require('./StoreStore');
 var LoginInfo = require('./LoginInfo');
 
 module.exports = React.createClass(
     {
         getInitialState: function()
         {
-            return {currentStore: SchindlerStore.getCurrentStore()};
+            return {currentStore: StoreStore.getCurrentStore()};
+        },
+
+        changeStore: function()
+        {
+            AppDispatcher.dispatch({operation:"select_store",
+                                    data:{}});
         },
 
         render: function()
@@ -22,12 +28,12 @@ module.exports = React.createClass(
 
         componentWillMount: function()
         {
-            SchindlerStore.addChangeListener(this.onChange);
+            StoreStore.addChangeListener(this.onChange);
         },
 
         onChange: function()
         {
-            this.setState({currentStore: SchindlerStore.getCurrentStore()});
+            this.setState({currentStore: StoreStore.getCurrentStore()});
         }
         
     });

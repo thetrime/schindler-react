@@ -66,6 +66,12 @@ insert(Connection, user(Username, Password)):-
                            odbc_free_statement(Statement)).
 
 
+insert(Connection, store(Name, Latitude, Longitude)):-
+        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO stores(name, latitude, longitude) VALUES (?, ?, ?)', [default, default, default], Statement, []),
+                           odbc_execute(Statement, [Name, Latitude, Longitude], _),
+                           odbc_free_statement(Statement)).
+
+
 delete(Connection, item(Key, Name)):-
         setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM item WHERE key = ? AND name = ?', [default, default], Statement, []),
                            odbc_execute(Statement, [Key, Name], _),
@@ -79,7 +85,7 @@ delete(Connection, list_item(Key, Name)):-
 delete(Connection, known_item_location(Key, Item, Store, Location)):-
         setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM known_item_location WHERE key = ? AND item = ? AND store = ? AND location = ?', [default, default, default, default], Statement, []),
                            odbc_execute(Statement, [Key, Item, Store, Location], _),
-                           odbc_free_statement(Statement)).        
+                           odbc_free_statement(Statement)).
 
 item_location(Key, Item, Store, Aisle):-
         select(Connection,
@@ -169,7 +175,7 @@ upgrade_schema_from(Connection, 0):-
         odbc_query(Connection, 'INSERT INTO schema(version) VALUES (1)', _),
         odbc_query(Connection, 'CREATE TABLE item(key VARCHAR, name VARCHAR)', _),
         odbc_query(Connection, 'CREATE TABLE list_item(key VARCHAR, name VARCHAR)', _),
-        odbc_query(Connection, 'CREATE TABLE store(key VARCHAR, name VARCHAR)', _),
+        odbc_query(Connection, 'CREATE TABLE store(key VARCHAR, name VARCHAR, latitude VARCHAR, longitude VARCHAR)', _),
         odbc_query(Connection, 'CREATE TABLE aisle(key VARCHAR, name VARCHAR, store VARCHAR)', _),
         odbc_query(Connection, 'CREATE TABLE known_item_location(key VARCHAR, item VARCHAR, store VARCHAR, location VARCHAR)', _),
         odbc_query(Connection, 'CREATE TABLE checkpoint(key VARCHAR, checkpoint VARCHAR)', _),

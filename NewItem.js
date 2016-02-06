@@ -5,7 +5,7 @@ module.exports = React.createClass(
     {
         addItem: function()
         {
-            this.props.addItem(this.props.name);
+            this.props.addItem({name:this.props.name});
         },
         render: function()
         {

@@ -8,6 +8,7 @@ var ConnectionInfo = require('./ConnectionInfo');
 var SchindlerStore = require('./SchindlerStore');
 var LoginView = require('./LoginView');
 var LoginInfo = require('./LoginInfo');
+var StoreView = require('./StoreView');
 module.exports = React.createClass(
     {
         getInitialState: function()
@@ -33,6 +34,12 @@ module.exports = React.createClass(
                 return (<div className="vertical_layout vertical_fill">
                         <TitleBar/>
                         <AisleView item={this.state.pending_item}/>
+                        <ConnectionInfo/>
+                        </div>);
+            else if (this.state.currentView == "select_store")
+                return (<div className="vertical_layout vertical_fill">
+                        <TitleBar/>
+                        <StoreView/>
                         <ConnectionInfo/>
                         </div>);
         },

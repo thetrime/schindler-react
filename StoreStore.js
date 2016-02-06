@@ -24,11 +24,16 @@ var StoreStore = assign({},
                             },
 
                             /* Actual logic */
-                            getStores: function()
+                            getStoreNames: function()
                             {
                                 var store_names = [];
-                                stores.forEach(function(s) { store_names.push(s.name);});
+                                Object.keys(stores).forEach(function(s) { store_names.push({name: s});});
                                 return store_names;
+                            },
+
+                            getCurrentStore: function()
+                            {
+                                return current_store;
                             },
 
                             getAisleFor: function(item)
@@ -46,7 +51,6 @@ var StoreStore = assign({},
                                                                      {
                                                                          aisles.push({name:aisle.name});
                                                                      });
-                                console.log(aisles);
                                 return aisles;
                             },
 
@@ -71,7 +75,6 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                   {
                                                       if (event.operation == "ohai")
                                                       {
-                                                          console.log(event.data);
                                                           // Initialization message. We are only interested in the .locations part
                                                           stores = {};
                                                           event.data.stores.forEach(function(store)
@@ -96,7 +99,6 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                       }
                                                       if (event.operation == "set_item_location")
                                                       {
-                                                          console.log("Setting " + event.data.item + " location to " + event.data.location);
                                                           stores[event.data.store].item_locations[event.data.item] = event.data.location;
                                                           StoreStore.emitChange();
                                                           // Also advise the server of this realization
@@ -107,6 +109,29 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                       {
                                                           ServerConnection.sendMessage(event);
                                                       }
+                                                      if (event.operation == "set_store_location")
+                                                      {
+                                                          if (event.origin == 'client')
+                                                              ServerConnection.sendMessage(event);
+                                                      }
+                                                      if (event.operation == "new_store")
+                                                      {
+                                                          if (stores[event.data.name] === undefined)
+                                                          {
+                                                              stores[event.data.name] = {};
+                                                              stores[event.data.name].aisles = [];
+                                                              stores[event.data.name].item_locations = {};
+                                                          }
+                                                          if (event.origin == 'client')
+                                                              ServerConnection.sendMessage(event);
+                                                      }
+                                                      if (event.operation == "set_store")
+                                                      {
+                                                          console.log('Store is now ' + event.data.name);
+                                                          current_store = event.data.name;
+                                                          StoreStore.emitChange();
+                                                      }
+                                                      
                                                   });
 
 module.exports = StoreStore;

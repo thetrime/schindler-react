@@ -25,7 +25,7 @@ ws(Websocket):-
 client(ClientId, Class, WebSocket, Key) :-
         format(user_error, 'Waiting for message...~n', []),
         ws_receive(WebSocket, Message, [format(json), value_string_as(atom)]),
-        format(user_error, 'Message: ~q~n', [Message]),
+        format(user_error, 'User ~w: Message: ~q~n', [Key, Message]),
         ( Message.opcode == close ->
             thread_send_message(ClientId, close)
         ; Message.opcode == text ->
@@ -129,6 +129,25 @@ handle_message(Key, Class, set_item_location, Message):-
                     ( delete(Connection, known_item_location(Key, Item, Store, Location)),
                       insert(Connection, known_item_location(Key, Item, Store, Location)))),
         ws_send_message(Class, set_item_location, Message).
+
+
+handle_message(Key, Class, new_store, Message):-
+        Name = Message.name,
+        Latitude = Message.latitude,
+        Longitude = Message.longitude,
+        transaction(Key,
+                    Connection,
+                    insert(Connection, store(Name, Latitude, Longitude))),
+        ws_send_message(Class, new_store, Message).
+
+handle_message(Key, Class, set_store_location, Message):-
+        Name = Message.name,
+        Latitude = Message.latitude,
+        Longitude = Message.longitude,
+        transaction(Key,
+                    Connection,
+                    update(Connection, store(Name, Latitude, Longitude))),
+        ws_send_message(Class, new_store, Message).
 
 
 item_information(Key, _, Items):-

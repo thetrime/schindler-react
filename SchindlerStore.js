@@ -2,9 +2,9 @@ var AppDispatcher = require('./AppDispatcher');
 var assign = require('object-assign');
 var EventEmitter = require('events').EventEmitter;
 var ServerConnection = require('./ServerConnection');
+var StoreStore = require('./StoreStore');
 
 var current_view = "login";
-var current_store = "home";
 var pending_item = {};
 
 var SchindlerStore = assign({},
@@ -27,10 +27,6 @@ var SchindlerStore = assign({},
                                 getTopLevelView: function()
                                 {
                                     return current_view;
-                                },
-                                getCurrentStore: function()
-                                {
-                                    return current_store;
                                 },
                                 getPendingItem: function()
                                 {
@@ -63,7 +59,12 @@ SchindlerStore.dispatchToken = AppDispatcher.register(function(event)
                                                           }
                                                           if (event.operation == "login_failed")
                                                           {
-                                                              
+                                                              // FIXME: Do /something/! This should probably be listened to by the LoginView
+                                                          }
+                                                          if (event.operation == "select_store")
+                                                          {
+                                                              current_view = "select_store";
+                                                              SchindlerStore.emitChange();
                                                           }
                                                           if (event.operation == "logout")
                                                           {
@@ -71,7 +72,13 @@ SchindlerStore.dispatchToken = AppDispatcher.register(function(event)
                                                               current_view = "login";
                                                               SchindlerStore.emitChange();
                                                           }
-
+                                                          if (event.operation == "set_store")
+                                                          {
+                                                              // Wait for the store to be changed before we swap the view back
+                                                              AppDispatcher.waitFor([StoreStore.dispatchToken]);
+                                                              current_view = "shop";
+                                                              SchindlerStore.emitChange();
+                                                          }
                                                       });
 
 module.exports = SchindlerStore;

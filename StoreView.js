@@ -1,13 +1,12 @@
 var React = require('react');
-var ShoppingItemStore = require('./ShoppingItemStore');
 var SearchBox = require('./SearchBox');
-var AisleTable = require('./AisleTable');
+var StoreTable = require('./StoreTable');
 var ServerConnection = require('./ServerConnection');
 var StoreStore = require('./StoreStore');
 
 function getStateFromStore()
 {
-    return {aisles: StoreStore.getAislesForCurrentStore()};
+    return {stores: StoreStore.getStoreNames()};
 }
 
 
@@ -16,7 +15,7 @@ module.exports = React.createClass(
         getInitialState: function()
         {
             return {filterText: '',
-                    aisles: StoreStore.getAislesForCurrentStore()};
+                    stores: StoreStore.getStoreNames()};
         },
 
         onChange: function()
@@ -29,7 +28,7 @@ module.exports = React.createClass(
             this.setState({filterText: value});
         },
        
-        addAisle: function(item)
+        addStore: function(item)
         {
             this.setState({items: this.state.items.concat([item])});
         },
@@ -48,7 +47,7 @@ module.exports = React.createClass(
         {
             return (<div className="vertical_layout vertical_fill">
                     <SearchBox filterText={this.state.filterText} redoSearch={this.redoSearch}/>
-                    <AisleTable aisles={this.state.aisles} filterText={this.state.filterText} redoSearch={this.redoSearch} store={StoreStore.getCurrentStore()} item={this.props.item} className="horizontal_fill vertical_fill"/> 
-                    </div>);
+                    <StoreTable stores={this.state.stores} filterText={this.state.filterText} redoSearch={this.redoSearch} className="horizontal_fill vertical_fill" latitude={0} longitude={0}/> 
+                    </div>); 
         }
     });
