@@ -3,7 +3,7 @@ var AppDispatcher = require('./AppDispatcher');
 var ServerConnection = require('./ServerConnection');
 var ShoppingView = require('./ShoppingView');
 var AisleView = require('./AisleView');
-var ShopName = require('./ShopName');
+var TitleBar = require('./TitleBar');
 var ConnectionInfo = require('./ConnectionInfo');
 var SchindlerStore = require('./SchindlerStore');
 var Login = require('./Login');
@@ -25,13 +25,13 @@ module.exports = React.createClass(
                         </div>);
             else if (this.state.currentView == "shop")
                 return (<div className="vertical_layout vertical_fill">
-                        <ShopName/>
+                        <TitleBar/>
                         <ShoppingView/>
                         <ConnectionInfo/>
                         </div>);
             else if (this.state.currentView == "select_aisle")
                 return (<div className="vertical_layout vertical_fill">
-                        <ShopName/>
+                        <TitleBar/>
                         <AisleView item={this.state.pending_item}/>
                         <ConnectionInfo/>
                         </div>);
