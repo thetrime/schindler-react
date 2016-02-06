@@ -1,5 +1,4 @@
 var React = require('react');
-var ShoppingItemStore = require('./ShoppingItemStore');
 var SearchBox = require('./SearchBox');
 var AisleTable = require('./AisleTable');
 var ServerConnection = require('./ServerConnection');
