@@ -15,7 +15,7 @@ module.exports = React.createClass(
         getInitialState: function()
         {
             return {filterText: '',
-                    items: []};
+                    items: ShoppingItemStore.getItems()};
         },
 
         onChange: function()

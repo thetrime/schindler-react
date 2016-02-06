@@ -10,7 +10,7 @@ module.exports = React.createClass(
         {
             AppDispatcher.dispatch({operation:"set_item_location",
                                     origin:"client",
-                                    data:{location:aisle,
+                                    data:{location:aisle.name,
                                           item:this.props.item,
                                           store:this.props.store}});
             // Also delete the item from the list

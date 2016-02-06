@@ -46,7 +46,16 @@ function addItem(item)
                     on_list:true,
                     location:StoreStore.getAisleFor(item.name)};
     items.push(new_item);
+}
 
+function relocateItems()
+{
+    var i = items;
+    items = [];
+    i.forEach(function(item)
+              {
+                  addItem(item);
+              });
 }
 
 ShoppingItemStore.dispatchToken = AppDispatcher.register(function(event)
@@ -117,6 +126,12 @@ ShoppingItemStore.dispatchToken = AppDispatcher.register(function(event)
                                                                  ShoppingItemStore.emitChange();
                                                                  // then tell the server
                                                                  ServerConnection.sendMessage(event);
+                                                             }
+                                                             if (event.operation == "set_store")
+                                                             {
+                                                                 AppDispatcher.waitFor([StoreStore.dispatchToken]);
+                                                                 relocateItems();
+                                                                 ShoppingItemStore.emitChange();
                                                              }
                                                          });
 
