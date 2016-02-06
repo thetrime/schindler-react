@@ -9,10 +9,12 @@ module.exports = React.createClass(
     {
         newStore: function(store)
         {
+            var location = GPSTracker.getLocation();
             AppDispatcher.dispatch({operation:"new_store",
                                     origin:"client",
-                                    data:{name: store.name}});
-            var location = GPSTracker.getLocation();
+                                    data:{name: store.name,
+                                          latitude:location.latitude,
+                                          longitude:location.latitude}});
             AppDispatcher.dispatch({operation:"set_store_location",
                                     origin:"client",
                                     data:{name:store.name,

@@ -67,15 +67,15 @@ insert(Connection, user(Username, Password)):-
                            odbc_free_statement(Statement)).
 
 
-insert(Connection, store(Name, Latitude, Longitude)):-
-        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO store(name, latitude, longitude) VALUES (?, ?, ?)', [default, float, float], Statement, []),
-                           odbc_execute(Statement, [Name, Latitude, Longitude], _),
+insert(Connection, store(Key, Name, Latitude, Longitude)):-
+        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO store(key, name, latitude, longitude) VALUES (?, ?, ?, ?)', [default, default, float, float], Statement, []),
+                           odbc_execute(Statement, [Key, Name, Latitude, Longitude], _),
                            odbc_free_statement(Statement)).
 
 
-update(Connection, store(Name, Latitude, Longitude)):-
-        setup_call_cleanup(odbc_prepare(Connection, 'UPDATE store SET latitude=?, longitude=? WHERE name=?', [float, float, default], Statement, []),
-                           odbc_execute(Statement, [Latitude, Longitude, Name], _),
+update(Connection, store(Key, Name, Latitude, Longitude)):-
+        setup_call_cleanup(odbc_prepare(Connection, 'UPDATE store SET latitude=?, longitude=? WHERE name=? AND key=?', [float, float, default, default], Statement, []),
+                           odbc_execute(Statement, [Latitude, Longitude, Name, Key], _),
                            odbc_free_statement(Statement)).
 
 

@@ -140,7 +140,7 @@ handle_message(Key, Class, new_store, Message):-
         Longitude = Message.longitude,
         transaction(Key,
                     Connection,
-                    insert(Connection, store(Name, Latitude, Longitude))),
+                    ??insert(Connection, store(Key, Name, Latitude, Longitude))),
         ws_send_message(Class, new_store, Message).
 
 handle_message(Key, Class, set_store_location, Message):-
@@ -149,7 +149,7 @@ handle_message(Key, Class, set_store_location, Message):-
         Longitude = Message.longitude,
         transaction(Key,
                     Connection,
-                    update(Connection, store(Name, Latitude, Longitude))),
+                    update(Connection, store(Key, Name, Latitude, Longitude))),
         ws_send_message(Class, set_store_location, Message).
 
 

@@ -130,6 +130,8 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                       {
                                                           // Initialization message. We are only interested in the .locations part
                                                           stores = {};
+                                                          console.log(event.data.stores);
+                                                          
                                                           event.data.stores.forEach(function(store)
                                                                                     {
                                                                                         stores[store.name] = {};
