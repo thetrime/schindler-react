@@ -51,6 +51,7 @@ module.exports = React.createClass(
 
         onChange: function()
         {
+            console.log("SchindlerStore emitted a change. Top level view is now: " + SchindlerStore.getTopLevelView());
             this.setState({currentView: SchindlerStore.getTopLevelView(),
                            pending_item: SchindlerStore.getPendingItem()});
         }

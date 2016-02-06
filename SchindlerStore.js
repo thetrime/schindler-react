@@ -51,11 +51,16 @@ SchindlerStore.dispatchToken = AppDispatcher.register(function(event)
                                                           }
                                                           if (event.operation == "login_ok")
                                                           {
-                                                              current_view = "shop";
                                                               localStorage.setItem("credentials", JSON.stringify({username:event.data.username,
                                                                                                                   password:event.data.password}));
                                                               SchindlerStore.emitChange();
                                                               (ServerConnection.reloadList.bind(ServerConnection))()
+                                                          }
+                                                          if (event.operation == "login_ok" && current_view == "login")
+                                                          {
+                                                              AppDispatcher.waitFor([StoreStore.dispatchToken]);
+                                                              current_view = "shop";
+                                                              SchindlerStore.emitChange();
                                                           }
                                                           if (event.operation == "login_failed")
                                                           {
@@ -63,7 +68,7 @@ SchindlerStore.dispatchToken = AppDispatcher.register(function(event)
                                                           }
                                                           if (event.operation == "select_store")
                                                           {
-                                                              current_view = "select_store";
+                                                              current_view = "select_store";                                                             
                                                               SchindlerStore.emitChange();
                                                           }
                                                           if (event.operation == "logout")
