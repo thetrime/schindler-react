@@ -180,7 +180,7 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                       {
                                                           // The server wants us to add an item
                                                           var found = false;
-                                                          for (var i = 0; i < items.length; i++)
+                                                          for (var i = 0; i < current_list.length; i++)
                                                           {
                                                               if (current_list[i].name == event.data.name)
                                                               {
@@ -191,7 +191,7 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                           if (!found)
                                                           {
                                                               console.log("Adding item " + event.data.name);
-                                                              addItem(event.data);
+                                                              addItemToCurrentList(event.data);
                                                               StoreStore.emitChange();                                                                     
                                                           }
                                                           else
@@ -204,7 +204,7 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                           // The user wants to add an item
                                                           // First, add it locally
                                                           console.log("Adding " + event.data);
-                                                          addItem(event.data);
+                                                          addItemToCurrentList(event.data);
                                                           StoreStore.emitChange();
                                                           // then tell the server
                                                           ServerConnection.sendMessage(event);
@@ -213,7 +213,7 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                       {
                                                           // The user wants to add an existing item
                                                           // First, add it locally
-                                                          addItem(event.data);
+                                                          addItemToCurrentList(event.data);
                                                           StoreStore.emitChange();
                                                           // then tell the server
                                                           ServerConnection.sendMessage(event);

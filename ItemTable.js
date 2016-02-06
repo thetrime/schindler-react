@@ -63,7 +63,7 @@ module.exports = React.createClass(
             var table = this;
             if (filter != '' && !exactMatch)
             {
-                rows.push(<NewItem name={filter} key={filter} addItem={this.addItem} label="Add New Item"/>);
+                rows.push(<NewItem name={filter} key={filter} addItem={table.addItem} label="Add New Item"/>);
             }
             Object.keys(groups).sort().forEach(function(group)
                            {
