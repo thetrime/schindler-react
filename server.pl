@@ -74,7 +74,14 @@ dispatch(WebSocket):-
 run:-
         prepare_database,
         prolog_server(9998, []),
-        http_server(http_dispatch, [port(9999)]).
+        http_server(http_dispatch, [port(9999)]),
+        % If stdin does not exist, then just wait around
+        ( at_end_of_stream(current_input)->
+            thread_get_message(_)
+        ; otherwise->
+            % Otherwise finish run/0 and run the toplevel
+            true
+        ).
 
 %-------------------------------------
 
