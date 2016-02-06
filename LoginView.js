@@ -40,7 +40,7 @@ module.exports = React.createClass(
                     <label htmlFor="username">Username:</label>
                     </div>
                     <div>
-                    <input type="text" id="username" value={this.state.username} onChange={this.inputChanged} ref="userName" autoFocus="on" autoCapitalize="off" />
+                    <input type="text" id="username" value={this.state.username} onChange={this.inputChanged} ref="userName" autoFocus="on" autoCapitalize="off" autoComplete="off" autoCorrect="off" spellcheck="false"/>
                     </div>
                     <div id="password_div">
                     <div>
