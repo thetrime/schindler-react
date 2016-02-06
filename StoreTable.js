@@ -3,6 +3,7 @@ var AppDispatcher = require('./AppDispatcher');
 var ServerConnection = require('./ServerConnection');
 var NewItem = require('./NewItem');
 var Item = require('./Item');
+var GPSTracker = require('./GPSTracker');
 
 module.exports = React.createClass(
     {
@@ -11,11 +12,12 @@ module.exports = React.createClass(
             AppDispatcher.dispatch({operation:"new_store",
                                     origin:"client",
                                     data:{name: store.name}});
+            var location = GPSTracker.getLocation();
             AppDispatcher.dispatch({operation:"set_store_location",
                                     origin:"client",
                                     data:{name:store.name,
-                                          latitude:this.props.latitude,
-                                          longitude:this.props.longitude}});
+                                          latitude:location.latitude,
+                                          longitude:location.longitude}});
             // Also change the current store
             AppDispatcher.dispatch({operation:"set_store",
                                     data:{name:store.name}});
@@ -23,11 +25,14 @@ module.exports = React.createClass(
         
         selectStore: function(store)
         {
+            var location = GPSTracker.getLocation();
+            console.log("Location is: ");
+            console.log(location);
             AppDispatcher.dispatch({operation:"set_store_location",
                                     origin:"client",
                                     data:{name:store.name,
-                                          latitude:this.props.latitude,
-                                          longitude:this.props.longitude}});
+                                          latitude:location.latitude,
+                                          longitude:location.longitude}});
             // Also change the current store
             AppDispatcher.dispatch({operation:"set_store",
                                     data:{name:store.name}});

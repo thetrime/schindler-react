@@ -2,9 +2,10 @@
          [prepare_database/0,
           insert/2,
           delete/2,
+          update/2,
           check_login/2,
           item_location/4,
-          store/2,
+          store/4,
           item/2,
           list_item/2,
           transaction/3]).
@@ -67,8 +68,14 @@ insert(Connection, user(Username, Password)):-
 
 
 insert(Connection, store(Name, Latitude, Longitude)):-
-        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO stores(name, latitude, longitude) VALUES (?, ?, ?)', [default, default, default], Statement, []),
+        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO store(name, latitude, longitude) VALUES (?, ?, ?)', [default, float, float], Statement, []),
                            odbc_execute(Statement, [Name, Latitude, Longitude], _),
+                           odbc_free_statement(Statement)).
+
+
+update(Connection, store(Name, Latitude, Longitude)):-
+        setup_call_cleanup(odbc_prepare(Connection, 'UPDATE store SET latitude=?, longitude=? WHERE name=?', [float, float, default], Statement, []),
+                           odbc_execute(Statement, [Latitude, Longitude, Name], _),
                            odbc_free_statement(Statement)).
 
 
@@ -105,14 +112,14 @@ item(Key, Item):-
                        Rows)),
         member(row(Item), Rows).
 
-store(Key, Store):-
+store(Key, Store, Latitude, Longitude):-
         select(Connection,
                findall(Row,
-                       setup_call_cleanup(odbc_prepare(Connection, 'SELECT name FROM store WHERE key = ?', [default], Statement, []),
+                       setup_call_cleanup(odbc_prepare(Connection, 'SELECT name, latitude, longitude FROM store WHERE key = ?', [default], Statement, []),
                                           odbc_execute(Statement, [Key], Row),
                                           odbc_free_statement(Statement)),
                        Rows)),
-        member(row(Store), Rows).
+        member(row(Store, Latitude, Longitude), Rows).
 
 list_item(Key, Item):-
         select(Connection,

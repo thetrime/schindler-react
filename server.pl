@@ -52,7 +52,7 @@ client(ClientId, Class, WebSocket, Key) :-
 
 ws_send_message(Class, Key, Data):-
         with_output_to(atom(Atom),
-                       json_write(current_output, _{operation:Key, data:Data})),
+                       json_write(current_output, _{operation:Key, data:Data}, [null({null})])),
         forall(listener(Class, ClientId),
                thread_send_message(ClientId, send(Atom))).
 
@@ -147,7 +147,7 @@ handle_message(Key, Class, set_store_location, Message):-
         transaction(Key,
                     Connection,
                     update(Connection, store(Name, Latitude, Longitude))),
-        ws_send_message(Class, new_store, Message).
+        ws_send_message(Class, set_store_location, Message).
 
 
 item_information(Key, _, Items):-
@@ -184,8 +184,10 @@ list_information(Key, _, Data):-
         ).
 
 store_information(Key, _, Data):-
-        ( bagof(x{name:Name},
-                store(Key, Name),
+        ( bagof(x{name:Name,
+                  latitude:Latitude,
+                  longitude:Longitude},
+                store(Key, Name, Latitude, Longitude),
                 Data)->
             true
         ; otherwise->

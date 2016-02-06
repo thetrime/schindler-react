@@ -3,8 +3,10 @@ var ReactDOM = require('react-dom');
 
 var ServerConnection = require('./ServerConnection');
 var SchindlerApp = require('./SchindlerApp');
+var GPSTracker = require('./GPSTracker');
 
 ServerConnection.initialize();
+GPSTracker.initialize();
 ReactDOM.render(<div className="root vertical_layout">
                 <SchindlerApp mode="login"/>
                 </div>,
@@ -13,11 +15,11 @@ ReactDOM.render(<div className="root vertical_layout">
 
 
 /* To do list:
-   * Geolocation for store (and ability to change store)
+   * Geolocation for store
    * Undo
    * Details screen for items
-   * Defer mode and relocate mode.
-   * Multiple users
+   * Defer mode and relocate mode. (Maybe put this inside the details screen?)
+   * Secure password management (or at least not totally insecure management!)
    * Gzip large items
    * Native version :P
 

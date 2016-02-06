@@ -2,10 +2,58 @@ var AppDispatcher = require('./AppDispatcher');
 var assign = require('object-assign');
 var EventEmitter = require('events').EventEmitter;
 var ServerConnection = require('./ServerConnection');
+var GPSTracker = require('./GPSTracker');
 var stores = [];
-var items = [];
+var all_items = [];
+var current_list = [];
 
 var current_store = 'home';
+
+function setCurrentList(i)
+{
+    current_list = [];
+    i.forEach(function(item)              
+              {
+                  addItemToCurrentList(item);
+              });
+}
+
+function addItemToCurrentList(item)
+{
+    var new_item = {name:item.name,
+                    on_list:true,
+                    location:StoreStore.getAisleFor(item.name)};
+    current_list.push(new_item);
+}
+
+function relocateItems()
+{
+    var i = current_list;
+    current_list = [];
+    i.forEach(function(item)
+              {
+                  addItemToCurrentList(item);
+              });
+}
+
+function getNearestStoreTo(position)
+{
+    var distance = -1;
+    var store = 'home';
+    console.log("Getting nearest store:");    
+    Object.keys(stores).forEach(function(storeName)
+                                {
+                                    var d = GPSTracker.haversine(stores[storeName].location, position);
+                                    console.log('Distance to ' + storeName + ' is ' + d + ' metres');
+                                    if (distance == -1 || d < distance)
+                                    {
+                                        distance = d;
+                                        store = storeName;
+                                    }
+                                });
+    console.log('The closest store is ' + store);
+    return store;
+}
 
 var StoreStore = assign({},
                         EventEmitter.prototype,
@@ -24,6 +72,11 @@ var StoreStore = assign({},
                             },
 
                             /* Actual logic */
+                            getCurrentList: function()
+                            {
+                                return current_list;
+                            },
+                            
                             getStoreNames: function()
                             {
                                 var store_names = [];
@@ -52,19 +105,19 @@ var StoreStore = assign({},
                                                                          aisles.push({name:aisle.name});
                                                                      });
                                 return aisles;
-                            },
+                            },                            
 
                             getItemsForCurrentStore: function()
                             {
                                 var located_items = [];
-                                items.forEach(function(item)
-                                              {
-                                                  if (stores[current_store].item_locations[item.name] === undefined)
-                                                      located_items.push({name:item.name,
-                                                                          location:"unknown"});
-                                                  else
-                                                      located_items.push({name:item.name,
-                                                                          location:stores[current_store].item_locations[item.name]});                                                  
+                                all_items.forEach(function(item)
+                                                  {
+                                                      if (stores[current_store].item_locations[item.name] === undefined)
+                                                          located_items.push({name:item.name,
+                                                                              location:"unknown"});
+                                                      else
+                                                          located_items.push({name:item.name,
+                                                                              location:stores[current_store].item_locations[item.name]});                                                  
                                               });
                                
                                 return located_items;
@@ -80,10 +133,12 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                           event.data.stores.forEach(function(store)
                                                                                     {
                                                                                         stores[store.name] = {};
+                                                                                        stores[store.name].location = {latitude:store.latitude,
+                                                                                                                       longitude:store.longitude};
                                                                                         stores[store.name].aisles = [];
                                                                                         stores[store.name].item_locations = {};
                                                                                     });
-                                                          items = event.data.items;
+                                                          all_items = event.data.items;
                                                           event.data.item_locations.forEach(function(store)
                                                                                             {
                                                                                                 store.aisles.forEach(function(aisle)
@@ -95,6 +150,7 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                                                                                                              });
                                                                                                                      });
                                                                                             });
+                                                          setCurrentList(event.data.list);
                                                           StoreStore.emitChange();
                                                       }
                                                       if (event.operation == "set_item_location")
@@ -105,12 +161,71 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                           if (event.origin == 'client')
                                                               ServerConnection.sendMessage(event);
                                                       }
+                                                      if (event.operation == "got_item" && event.data.location != "unknown")
+                                                      {
+                                                          // Delete the item from the list in any case - if the server is responding, then we will
+                                                          // waste some time processing a meaningless delete_item, but it wont really matter
+                                                          current_list = current_list.filter(function(a) {return a.name != event.data.name});
+                                                          StoreStore.emitChange();
+                                                          // And also tell the server
+                                                          ServerConnection.sendMessage(event);
+                                                      }
+                                                      if (event.operation == "delete_item")
+                                                      {
+                                                          // The server wants us to remove an item
+                                                          current_list = current_list.filter(function(a) {return a.name != event.data.name});
+                                                          StoreStore.emitChange();
+                                                      }
+                                                      if (event.operation == "add_list_item")
+                                                      {
+                                                          // The server wants us to add an item
+                                                          var found = false;
+                                                          for (var i = 0; i < items.length; i++)
+                                                          {
+                                                              if (current_list[i].name == event.data.name)
+                                                              {
+                                                                  found = true;
+                                                                  break;
+                                                              }
+                                                          }
+                                                          if (!found)
+                                                          {
+                                                              console.log("Adding item " + event.data.name);
+                                                              addItem(event.data);
+                                                              StoreStore.emitChange();                                                                     
+                                                          }
+                                                          else
+                                                          {
+                                                              console.log("Already have " + event.data);
+                                                          }
+                                                      }
+                                                      if (event.operation == "new_item")
+                                                      {
+                                                          // The user wants to add an item
+                                                          // First, add it locally
+                                                          console.log("Adding " + event.data);
+                                                          addItem(event.data);
+                                                          StoreStore.emitChange();
+                                                          // then tell the server
+                                                          ServerConnection.sendMessage(event);
+                                                      }
+                                                      if (event.operation == "want_item")
+                                                      {
+                                                          // The user wants to add an existing item
+                                                          // First, add it locally
+                                                          addItem(event.data);
+                                                          StoreStore.emitChange();
+                                                          // then tell the server
+                                                          ServerConnection.sendMessage(event);
+                                                      }
                                                       if (event.operation == "login")
                                                       {
                                                           ServerConnection.sendMessage(event);
                                                       }
                                                       if (event.operation == "set_store_location")
                                                       {
+                                                          stores[event.data.name].location = {latitude:event.data.latitude,
+                                                                                              longitude:event.data.longitude};
                                                           if (event.origin == 'client')
                                                               ServerConnection.sendMessage(event);
                                                       }
@@ -129,9 +244,19 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                       {
                                                           console.log('Store is now ' + event.data.name);
                                                           current_store = event.data.name;
+                                                          relocateItems();
                                                           StoreStore.emitChange();
                                                       }
-                                                      
+                                                      if (event.operation == "moved")
+                                                      {
+                                                          var new_store = getNearestStoreTo(event.data.position);
+                                                          if (new_store != current_store)
+                                                          {
+                                                              current_store = new_store
+                                                              StoreStore.emitChange();
+                                                          }
+                                                      }
+
                                                   });
 
 module.exports = StoreStore;

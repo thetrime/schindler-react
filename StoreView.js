@@ -22,7 +22,7 @@ module.exports = React.createClass(
         {
             this.setState(getStateFromStore());
         },
-        
+
         redoSearch: function(value)
         {
             this.setState({filterText: value});
@@ -47,7 +47,7 @@ module.exports = React.createClass(
         {
             return (<div className="vertical_layout vertical_fill">
                     <SearchBox filterText={this.state.filterText} redoSearch={this.redoSearch}/>
-                    <StoreTable stores={this.state.stores} filterText={this.state.filterText} redoSearch={this.redoSearch} className="horizontal_fill vertical_fill" latitude={0} longitude={0}/> 
+                    <StoreTable stores={this.state.stores} filterText={this.state.filterText} redoSearch={this.redoSearch} className="horizontal_fill vertical_fill"/> 
                     </div>); 
         }
     });

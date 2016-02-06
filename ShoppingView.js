@@ -1,12 +1,12 @@
 var React = require('react');
-var ShoppingItemStore = require('./ShoppingItemStore');
+var StoreStore = require('./StoreStore');
 var SearchBox = require('./SearchBox');
 var ItemTable = require('./ItemTable');
 var ServerConnection = require('./ServerConnection');
 
 function getStateFromStore()
 {
-    return {items: ShoppingItemStore.getItems()};
+    return {items: StoreStore.getCurrentList()};
 }
 
 
@@ -15,7 +15,7 @@ module.exports = React.createClass(
         getInitialState: function()
         {
             return {filterText: '',
-                    items: ShoppingItemStore.getItems()};
+                    items: StoreStore.getCurrentList()};
         },
 
         onChange: function()
@@ -43,12 +43,12 @@ module.exports = React.createClass(
         
         componentWillMount: function()
         {
-            ShoppingItemStore.addChangeListener(this.onChange);
+            StoreStore.addChangeListener(this.onChange);
         },
 
         componentWillUnmount: function()
         {
-            ShoppingItemStore.removeChangeListener(this.onChange);
+            StoreStore.removeChangeListener(this.onChange);
         },
         
         render: function()
