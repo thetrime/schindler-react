@@ -6,7 +6,7 @@ var AisleView = require('./AisleView');
 var TitleBar = require('./TitleBar');
 var ConnectionInfo = require('./ConnectionInfo');
 var SchindlerStore = require('./SchindlerStore');
-var Login = require('./Login');
+var LoginView = require('./LoginView');
 var LoginInfo = require('./LoginInfo');
 module.exports = React.createClass(
     {
@@ -20,7 +20,7 @@ module.exports = React.createClass(
         {
             if (this.state.currentView == "login")                
                 return (<div className="vertical_layout vertical_fill">
-                        <Login/>
+                        <LoginView/>
                         <ConnectionInfo/>                        
                         </div>);
             else if (this.state.currentView == "shop")
