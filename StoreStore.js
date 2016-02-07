@@ -128,10 +128,9 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                   {
                                                       if (event.operation == "ohai")
                                                       {
-                                                          // Initialization message. We are only interested in the .locations part
                                                           stores = {};
                                                           console.log(event.data.stores);
-                                                          
+                                                          // First construct the stores. Each store starts out with an empty aisle list and no item locations
                                                           event.data.stores.forEach(function(store)
                                                                                     {
                                                                                         stores[store.name] = {};
@@ -140,12 +139,18 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                                                         stores[store.name].aisles = [];
                                                                                         stores[store.name].item_locations = {};
                                                                                     });
+                                                          // Just copy the list of all known items
                                                           all_items = event.data.items;
+                                                          // For every aisle, create a reference in the appropriate store
+                                                          event.data.aisles.forEach(function(aisle)
+                                                                                    {
+                                                                                        stores[aisle.store].aisles.push({name:aisle.name});
+                                                                                    });
+                                                          // Finally, for each item with a known location, put it in the right htable
                                                           event.data.item_locations.forEach(function(store)
                                                                                             {
                                                                                                 store.aisles.forEach(function(aisle)
                                                                                                                      {
-                                                                                                                         stores[store.store_name].aisles.push({name:aisle.aisle_name});
                                                                                                                          aisle.items.forEach(function(item)
                                                                                                                                              {
                                                                                                                                                  stores[store.store_name].item_locations[item] = aisle.aisle_name;

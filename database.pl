@@ -7,6 +7,7 @@
           item_location/4,
           store/4,
           item/2,
+          aisle/3,
           list_item/2,
           transaction/3]).
 
@@ -116,6 +117,15 @@ item(Key, Item):-
                                           odbc_free_statement(Statement)),
                        Rows)),
         member(row(Item), Rows).
+
+aisle(Key, Name, Store):-
+        select(Connection,
+               findall(Row,
+                       setup_call_cleanup(odbc_prepare(Connection, 'SELECT name, store FROM aisle WHERE key = ?', [default], Statement, []),
+                                          odbc_execute(Statement, [Key], Row),
+                                          odbc_free_statement(Statement)),
+                       Rows)),
+        member(row(Name, Store), Rows).
 
 store(Key, Store, Latitude, Longitude):-
         select(Connection,

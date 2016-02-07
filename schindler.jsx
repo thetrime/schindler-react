@@ -15,7 +15,7 @@ ReactDOM.render(<div className="root vertical_layout">
 
 
 /* To do list:
-   * Geolocation for store
+   * Geolocation to move between stores automatically
    * Undo
    * Details screen for items
    * Defer mode and relocate mode. (Maybe put this inside the details screen?)
@@ -24,6 +24,5 @@ ReactDOM.render(<div className="root vertical_layout">
    * Native version :P
 
 Bugs:
-   * I think an aisle with no items will never be represented at a store
 
 */

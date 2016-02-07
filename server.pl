@@ -98,8 +98,10 @@ handle_message(Key, Class, hello, Message):-
         location_information(Key, Checkpoint, Locations),
         store_information(Key, Checkpoint, Stores),
         item_information(Key, Checkpoint, Items),
+        aisle_information(Key, Checkpoint, Aisles),
         list_information(Key, Checkpoint, List),
         ws_send_message(Class, ohai, _{stores:Stores,
+                                       aisles:Aisles,
                                        item_locations:Locations,
                                        items:Items,
                                        list:List}).
@@ -128,7 +130,7 @@ handle_message(Key, Class, new_aisle, Message):-
         Store = Message.store,
         transaction(Key,
                     Connection,
-                    insert(Connection, aisle(Key, Store, Name))),
+                    insert(Connection, aisle(Key, Name, Store))),
         ws_send_message(Class, new_aisle, _{name:Name,
                                             store:Store}).
 
@@ -206,6 +208,13 @@ store_information(Key, _, Data):-
             Data = []
         ).
 
+aisle_information(Key, _, Data):-
+        ( bagof(x{name:Name,
+                  store:Store},
+                aisle(Key, Name, Store),
+                Data)->
+            true
+        ; otherwise->
+            Data = []
+        ).
 
-% This is quite inefficient. We report that every item we know is in the unknown aisle for every store. It might be better to optimise that out
-% and just return a single list of all items *once*, and a list of items in a given store where known
