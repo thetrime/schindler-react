@@ -72,6 +72,11 @@ insert(Connection, store(Key, Name, Latitude, Longitude)):-
                            odbc_execute(Statement, [Key, Name, Latitude, Longitude], _),
                            odbc_free_statement(Statement)).
 
+insert(Connection, aisle(Key, Name, Store)):-
+        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO aisle(key, name, store) VALUES (?, ?, ?)', [default, default, default], Statement, []),
+                           odbc_execute(Statement, [Key, Name, Store], _),
+                           odbc_free_statement(Statement)).
+
 
 update(Connection, store(Key, Name, Latitude, Longitude)):-
         setup_call_cleanup(odbc_prepare(Connection, 'UPDATE store SET latitude=?, longitude=? WHERE name=? AND key=?', [float, float, default, default], Statement, []),

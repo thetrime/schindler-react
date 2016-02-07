@@ -242,6 +242,23 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                           if (event.origin == 'client')
                                                               ServerConnection.sendMessage(event);
                                                       }
+                                                      if (event.operation == "new_aisle")
+                                                      {
+                                                          var found = false;
+                                                          for (var i = 0; i < stores[event.data.store].aisles.length; i++)
+                                                          {
+                                                              if (stores[event.data.store].aisles[i].name == event.data.name)
+                                                              {
+                                                                  found = true;
+                                                                  break;
+                                                              }
+                                                          }
+                                                          if (!found)
+                                                              stores[event.data.store].aisles.push({name:event.data.name});
+                                                          if (event.origin == "client")
+                                                              ServerConnection.sendMessage(event);
+                                                          
+                                                      }
                                                       if (event.operation == "set_store")
                                                       {
                                                           console.log('Store is now ' + event.data.name);

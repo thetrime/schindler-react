@@ -123,6 +123,15 @@ handle_message(Key, Class, want_item, Message):-
         transaction(Key, Connection, insert(Connection, list_item(Key, Name))),
         ws_send_message(Class, add_list_item, _{name:Name}).
 
+handle_message(Key, Class, new_aisle, Message):-
+        Name = Message.name,
+        Store = Message.store,
+        transaction(Key,
+                    Connection,
+                    insert(Connection, aisle(Key, Store, Name))),
+        ws_send_message(Class, new_aisle, _{name:Name,
+                                            store:Store}).
+
 handle_message(Key, Class, set_item_location, Message):-
         Item = Message.item,
         Location = Message.location,
@@ -140,7 +149,7 @@ handle_message(Key, Class, new_store, Message):-
         Longitude = Message.longitude,
         transaction(Key,
                     Connection,
-                    ??insert(Connection, store(Key, Name, Latitude, Longitude))),
+                    insert(Connection, store(Key, Name, Latitude, Longitude))),
         ws_send_message(Class, new_store, Message).
 
 handle_message(Key, Class, set_store_location, Message):-
