@@ -31,29 +31,27 @@ module.exports = React.createClass(
         render: function()
         {
             return (<div className="login vertical_fill vertical_layout">
-                    <div className="horizontal_layout login_parent">
-                    <div className="login_box">
-                    <div>
-                    <h2>Schindler</h2>
-                    <div>
-                    <div id="username_div">
-                    <label htmlFor="username">Username:</label>
-                    </div>
-                    <div>
-                    <input type="text" id="username" value={this.state.username} onChange={this.inputChanged} ref="userName" autoFocus="on" autoCapitalize="off" autoComplete="off" autoCorrect="off" spellCheck="false"/>
-                    </div>
-                    <div id="password_div">
-                    <div>
-                    <label htmlFor="password">Password:</label>
-                    </div>
-                    <div>
-                    <input type="password" id="password" value={this.state.password} onChange={this.inputChanged} ref="password"/>
-                    </div>
-                    </div>
-                    </div>
-                    </div>
-                    <button onClick={this.login} className="login_button">Login</button>
-                    </div>
+                      <div className="horizontal_layout login_parent">
+                        <div className="login_box">
+                          <div>
+                            <h2>Schindler</h2>
+                            <div>
+                              <div id="username_div">
+                                <label htmlFor="username">Username:</label>
+                                <div>
+                                  <input type="text" id="username" value={this.state.username} onChange={this.inputChanged} ref="userName" autoCapitalize="off" autoComplete="off" autoCorrect="off" spellCheck="false"/>
+                                </div>
+                              </div>
+                              <div id="password_div">
+                                <label htmlFor="password">Password:</label>
+                                <div>
+                                  <input type="password" id="password" value={this.state.password} onChange={this.inputChanged} ref="password"/>
+                                </div>
+                             </div>
+                           </div>
+                        </div>
+                        <button onClick={this.login} className="login_button">Login</button>
+                      </div>
                     </div>
                     </div>);
         }

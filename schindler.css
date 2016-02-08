@@ -101,6 +101,7 @@ html, body
     align-self: center;
     padding: 20px;
     padding-top: 10px;
+    x-width: 75%;
 }
 
 .logout_button
@@ -124,6 +125,13 @@ html, body
     text-align: left;
     padding-top: 10px;
     padding-bottom: 10px;
+}
+
+#username, #password
+{
+    font-size: 16pt;
+    text-align: left;
+    x-width: 100%;
 }
 
 
