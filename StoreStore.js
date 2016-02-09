@@ -126,8 +126,17 @@ var StoreStore = assign({},
 
 StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                   {
-                                                      if (event.operation == "ohai")
+                                                      if (event.operation == "ohai" || event.operation == "ohai_again")
                                                       {
+                                                          if (event.operation == "ohai_again")
+                                                          {
+                                                              event.data = JSON.parse(localStorage.getItem("checkpoint_data"));
+                                                          }
+                                                          else
+                                                          {
+                                                              localStorage.setItem("checkpoint", event.data.checkpoint);
+                                                              localStorage.setItem("checkpoint_data", JSON.stringify(event.data));
+                                                          }
                                                           stores = {};
                                                           console.log(event.data.stores);
                                                           // First construct the stores. Each store starts out with an empty aisle list and no item locations
@@ -157,7 +166,7 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                                                                                                              });
                                                                                                                      });
                                                                                             });
-                                                          setCurrentList(event.data.list);
+                                                          setCurrentList(event.data.list);                                                          
                                                           StoreStore.emitChange();
                                                       }
                                                       if (event.operation == "set_item_location")

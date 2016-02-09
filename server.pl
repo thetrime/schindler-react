@@ -51,8 +51,8 @@ client(ClientId, WebSocket, Key) :-
 ws_send_message(Key, Operation, Data):-
         with_output_to(atom(Atom),
                        json_write(current_output, _{operation:Operation, data:Data}, [null({null})])),
-        forall(??listener(Key, ClientId),
-               ??thread_send_message(ClientId, send(Atom))).
+        forall(listener(Key, ClientId),
+               thread_send_message(ClientId, send(Atom))).
 
 dispatch(WebSocket):-
         thread_get_message(Message),
@@ -96,16 +96,22 @@ login(Fields, ClientId, Key, NewKey):-
 
 handle_message(Key, hello, Message):-
         Checkpoint = Message.checkpoint,
-        location_information(Key, Checkpoint, Locations),
-        store_information(Key, Checkpoint, Stores),
-        item_information(Key, Checkpoint, Items),
-        aisle_information(Key, Checkpoint, Aisles),
-        list_information(Key, Checkpoint, List),
-        ws_send_message(Key, ohai, _{stores:Stores,
-                                       aisles:Aisles,
-                                       item_locations:Locations,
-                                       items:Items,
-                                       list:List}).
+        checkpoint(Key, NewCheckpoint),
+        ( Checkpoint == NewCheckpoint ->
+            ws_send_message(Key, ohai_again, _{})
+        ; otherwise->
+            location_information(Key, Locations),
+            store_information(Key, Stores),
+            item_information(Key, Items),
+            aisle_information(Key, Aisles),
+            list_information(Key, List),
+            ws_send_message(Key, ohai, _{stores:Stores,
+                                         aisles:Aisles,
+                                         item_locations:Locations,
+                                         items:Items,
+                                         list:List,
+                                         checkpoint:NewCheckpoint})
+        ).
 
 handle_message(Key, got_item, Message):-
         Name = Message.name,
@@ -165,7 +171,7 @@ handle_message(Key, set_store_location, Message):-
         ws_send_message(Key, set_store_location, Message).
 
 
-item_information(Key, _, Items):-
+item_information(Key, Items):-
         ( bagof(x{name:Name},
                 item(Key, Name),
                 Items)->
@@ -174,7 +180,7 @@ item_information(Key, _, Items):-
             Items = []
         ).
 
-location_information(Key, _, Locations):-
+location_information(Key, Locations):-
         ( bagof(x{store_name:Store,
                   aisles:Aisles},
                 bagof(y{aisle_name:Aisle,
@@ -189,7 +195,7 @@ location_information(Key, _, Locations):-
         ).
 
 
-list_information(Key, _, Data):-
+list_information(Key, Data):-
         ( bagof(x{name:Name},
                 list_item(Key, Name),
                 Data)->
@@ -198,7 +204,7 @@ list_information(Key, _, Data):-
             Data = []
         ).
 
-store_information(Key, _, Data):-
+store_information(Key, Data):-
         ( bagof(x{name:Name,
                   latitude:Latitude,
                   longitude:Longitude},
@@ -209,7 +215,7 @@ store_information(Key, _, Data):-
             Data = []
         ).
 
-aisle_information(Key, _, Data):-
+aisle_information(Key, Data):-
         ( bagof(x{name:Name,
                   store:Store},
                 aisle(Key, Name, Store),

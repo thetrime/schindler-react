@@ -8,6 +8,7 @@
           store/4,
           item/2,
           aisle/3,
+          checkpoint/2,
           list_item/2,
           transaction/3]).
 
@@ -153,6 +154,11 @@ check_login(Username, Password):-
             transaction(Username, Connection, insert(Connection, user(Username, Password)))
         ).
 
+checkpoint(Key, Checkpoint):-
+        select(Connection,
+               setup_call_cleanup(odbc_prepare(Connection, 'SELECT checkpoint FROM checkpoint WHERE key = ?', [default], Statement, []),
+                                  odbc_execute(Statement, [Key], row(Checkpoint)),
+                                  odbc_free_statement(Statement))).
 
 :-meta_predicate(select(?, 0)).
 select(Connection, Goal):-        
