@@ -50,7 +50,7 @@ client(ClientId, WebSocket, Key) :-
 
 ws_send_message(Key, Operation, Data):-
         with_output_to(atom(Atom),
-                       json_write(current_output, _{operation:Operation, data:Data}, [null({null})])),
+                       json_write(current_output, _{operation:Operation, data:Data}, [null({null}), width(0)])),
         forall(listener(Key, ClientId),
                thread_send_message(ClientId, send(Atom))).
 
