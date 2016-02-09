@@ -24,5 +24,5 @@ ReactDOM.render(<div className="root vertical_layout">
    * Native version :P
 
 Bugs:
-
+   * Setting rotating the web-app version on my phone gives me the wrong viewport. This persists when I rotate back, too :(
 */

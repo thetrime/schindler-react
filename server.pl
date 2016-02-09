@@ -17,12 +17,10 @@
 
 ws(Websocket):-
         set_stream(Websocket, encoding(utf8)),
-        Class = foo,
         thread_create(dispatch(Websocket), ClientId, [detached(true)]),
-        assert(listener(Class, ClientId)),
-        client(ClientId, Class, Websocket, {null}).
+        client(ClientId, Websocket, {null}).
 
-client(ClientId, Class, WebSocket, Key) :-
+client(ClientId, WebSocket, Key) :-
         format(user_error, 'Waiting for message...~n', []),
         ws_receive(WebSocket, Message, [format(json), value_string_as(atom)]),
         format(user_error, 'User ~w: Message: ~q~n', [Key, Message]),
@@ -34,10 +32,10 @@ client(ClientId, Class, WebSocket, Key) :-
             Fields = Data.data,
             ( Operation == login->
                 % This is slightly different logic
-                login(Class, Fields, Key, NewKey)
+                login(Fields, ClientId, Key, NewKey)
             ; otherwise->
                 NewKey = Key,
-                ( catch(handle_message(Key, Class, Operation, Fields),
+                ( catch(handle_message(Key, Operation, Fields),
                         Exception,
                         format(user_error, 'Error: ~p~n', [Exception]))->
                     true
@@ -45,16 +43,16 @@ client(ClientId, Class, WebSocket, Key) :-
                     format(user_error, 'Error: ~p~n', [fail])
                 )
             ),
-            client(ClientId, Class, WebSocket, NewKey)
+            client(ClientId, WebSocket, NewKey)
         ; otherwise->
-            client(ClientId, Class, WebSocket, Key)
+            client(ClientId, WebSocket, Key)
         ).
 
-ws_send_message(Class, Key, Data):-
+ws_send_message(Key, Operation, Data):-
         with_output_to(atom(Atom),
-                       json_write(current_output, _{operation:Key, data:Data}, [null({null})])),
-        forall(listener(Class, ClientId),
-               thread_send_message(ClientId, send(Atom))).
+                       json_write(current_output, _{operation:Operation, data:Data}, [null({null})])),
+        forall(??listener(Key, ClientId),
+               ??thread_send_message(ClientId, send(Atom))).
 
 dispatch(WebSocket):-
         thread_get_message(Message),
@@ -81,60 +79,63 @@ wait:-
 
 %-------------------------------------
 
-login(Class, Fields, Key, NewKey):-
+login(Fields, ClientId, Key, NewKey):-
         Username = Fields.username,
         Password = Fields.password,
         ( check_login(Username, Password)->
             NewKey = Username,
-            ws_send_message(Class, login_ok, _{username:Username,
-                                               password:Password})
+            retractall(listener(_, ClientId)),
+            assert(listener(NewKey, ClientId)),
+            ws_send_message(NewKey, login_ok, _{username:Username,
+                                                  password:Password})
         ; otherwise->
             NewKey = Key,
-            ws_send_message(Class, login_failed, _{})
+            with_output_to(atom(Failed), json_write(current_output, _{operation:login_failed, data:{}}, [null({null})])),
+            thread_send_message(ClientId, send(Failed))
         ).
 
-handle_message(Key, Class, hello, Message):-
+handle_message(Key, hello, Message):-
         Checkpoint = Message.checkpoint,
         location_information(Key, Checkpoint, Locations),
         store_information(Key, Checkpoint, Stores),
         item_information(Key, Checkpoint, Items),
         aisle_information(Key, Checkpoint, Aisles),
         list_information(Key, Checkpoint, List),
-        ws_send_message(Class, ohai, _{stores:Stores,
+        ws_send_message(Key, ohai, _{stores:Stores,
                                        aisles:Aisles,
                                        item_locations:Locations,
                                        items:Items,
                                        list:List}).
 
-handle_message(Key, Class, got_item, Message):-
+handle_message(Key, got_item, Message):-
         Name = Message.name,
         transaction(Key, Connection, delete(Connection, list_item(Key, Name))),
-        ws_send_message(Class, delete_item, _{name:Name}).
+        ws_send_message(Key, delete_item, _{name:Name}).
 
-handle_message(Key, Class, new_item, Message):-
+handle_message(Key, new_item, Message):-
         Name = Message.name,
         transaction(Key,
                     Connection,
                     ( insert(Connection, item(Key, Name)),
                       insert(Connection, list_item(Key, Name)))),
-        ws_send_message(Class, add_list_item, _{name:Name}).
+        ws_send_message(Key, add_list_item, _{name:Name}).
 
 
-handle_message(Key, Class, want_item, Message):-
+handle_message(Key, want_item, Message):-
         Name = Message.name,
         transaction(Key, Connection, insert(Connection, list_item(Key, Name))),
-        ws_send_message(Class, add_list_item, _{name:Name}).
+        ws_send_message(Key, add_list_item, _{name:Name}).
 
-handle_message(Key, Class, new_aisle, Message):-
+handle_message(Key, new_aisle, Message):-
         Name = Message.name,
         Store = Message.store,
         transaction(Key,
                     Connection,
                     insert(Connection, aisle(Key, Name, Store))),
-        ws_send_message(Class, new_aisle, _{name:Name,
-                                            store:Store}).
+        ws_send_message(Key, new_aisle, _{name:Name,
+                                          store:Store}).
 
-handle_message(Key, Class, set_item_location, Message):-
+handle_message(Key, set_item_location, Message):-
         Item = Message.item,
         Location = Message.location,
         Store = Message.store,
@@ -142,26 +143,26 @@ handle_message(Key, Class, set_item_location, Message):-
                     Connection,
                     ( delete(Connection, known_item_location(Key, Item, Store, Location)),
                       insert(Connection, known_item_location(Key, Item, Store, Location)))),
-        ws_send_message(Class, set_item_location, Message).
+        ws_send_message(Key, set_item_location, Message).
 
 
-handle_message(Key, Class, new_store, Message):-
+handle_message(Key, new_store, Message):-
         Name = Message.name,
         Latitude = Message.latitude,
         Longitude = Message.longitude,
         transaction(Key,
                     Connection,
                     insert(Connection, store(Key, Name, Latitude, Longitude))),
-        ws_send_message(Class, new_store, Message).
+        ws_send_message(Key, new_store, Message).
 
-handle_message(Key, Class, set_store_location, Message):-
+handle_message(Key, set_store_location, Message):-
         Name = Message.name,
         Latitude = Message.latitude,
         Longitude = Message.longitude,
         transaction(Key,
                     Connection,
                     update(Connection, store(Key, Name, Latitude, Longitude))),
-        ws_send_message(Class, set_store_location, Message).
+        ws_send_message(Key, set_store_location, Message).
 
 
 item_information(Key, _, Items):-
