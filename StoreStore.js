@@ -137,7 +137,10 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                               localStorage.setItem("checkpoint", event.data.checkpoint);
                                                               localStorage.setItem("checkpoint_data", JSON.stringify(event.data));
                                                           }
-                                                          stores = {};
+                                                          stores = {home:{location: {latitude:0,
+                                                                                     longitude:0},
+                                                                          aisles: [],
+                                                                          item_locations: {}}};
                                                           console.log(event.data.stores);
                                                           // First construct the stores. Each store starts out with an empty aisle list and no item locations
                                                           event.data.stores.forEach(function(store)
