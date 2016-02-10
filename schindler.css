@@ -7,6 +7,12 @@ th
 .item_table
 {
     width: 100%;
+    border-collapse: collapse;
+}
+
+.item_table td
+{
+    padding: 0;
 }
 
 .search_field
@@ -43,10 +49,10 @@ html, body
 /* It is weird that I cannot seem to add a class to this div? */
 .search_bar
 {
+    background: lightgray;
     x-position: fixed;
     x-height: 20px;
     width: 100%;
-    background: white;
     x-top: 0;
 }
 
@@ -83,8 +89,18 @@ html, body
 }
 
 .shop_name
-{    
+{
     text-align: center;
+    height: 30pt;
+    display: table-cell;
+    vertical-align: middle;        
+}
+
+.shop_name_label
+{
+    display: -webkit-flex;
+    -webkit-align-items: center;
+    -webkit-justify-content: center;
 }
 
 .login
@@ -106,7 +122,13 @@ html, body
 
 .logout_button
 {
-    x-float: right;
+    border: 1px solid black;
+    -webkit-border-radius: 15px;
+    -webkit-appearance: none;
+    position: absolute;
+    height: 24pt;
+    right: 0px;
+    margin: 4pt 5px 5px 4pt;
 }
 
 .login_parent
@@ -134,6 +156,11 @@ html, body
     x-width: 100%;
 }
 
+.title_bar
+{   
+    height: 30pt;
+    background: lightgray;
+}
 
 .horizontal_layout
 {
