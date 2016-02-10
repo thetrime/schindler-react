@@ -31,5 +31,12 @@ module.exports = React.createClass(
         componentWillMount: function()
         {
             ServerConnectionStore.addChangeListener(this.onChange);
+        },
+
+        componentWillUnmount: function()
+        {
+            ServerConnectionStore.removeChangeListener(this.onChange);
         }
+
+
     });

@@ -32,6 +32,12 @@ module.exports = React.createClass(
             StoreStore.addChangeListener(this.onChange);
         },
 
+        componentWillUnmount: function()
+        {
+            StoreStore.removeChangeListener(this.onChange);
+        },
+
+        
         onChange: function()
         {
             this.setState({currentStore: StoreStore.getCurrentStore()});
