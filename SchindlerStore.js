@@ -4,7 +4,10 @@ var EventEmitter = require('events').EventEmitter;
 var ServerConnection = require('./ServerConnection');
 var StoreStore = require('./StoreStore');
 
-var current_view = "login";
+var current_view = localStorage.getItem("credentials") == null?"login":"shop";
+console.log(localStorage.getItem("credentials"));
+console.log('vs');
+console.log(null);
 var pending_item = {};
 
 var SchindlerStore = assign({},
@@ -73,7 +76,7 @@ SchindlerStore.dispatchToken = AppDispatcher.register(function(event)
                                                           }
                                                           if (event.operation == "logout")
                                                           {
-                                                              localStorage.setItem("credentials", null);
+                                                              localStorage.removeItem("credentials");
                                                               current_view = "login";
                                                               SchindlerStore.emitChange();
                                                           }
