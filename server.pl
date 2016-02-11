@@ -94,6 +94,14 @@ login(Fields, ClientId, Key, NewKey):-
             thread_send_message(ClientId, send(Failed))
         ).
 
+handle_message({null}, hello, _):-
+        !,
+        ws_send_message({null}, ohai, _{stores:[],
+                                        aisles:[],
+                                        item_locations:[],
+                                        items:[],
+                                        list:[],
+                                        checkpoint:{null}}).
 handle_message(Key, hello, Message):-
         Checkpoint = Message.checkpoint,
         checkpoint(Key, NewCheckpoint),
