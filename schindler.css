@@ -228,3 +228,11 @@ html, body
     box-sizing: border-box;
     height: 100%;
 }
+
+
+.vertical_center
+{
+    display: -webkit-flex;
+    -webkit-align-items: center;
+    -webkit-justify-content: center;
+}
