@@ -160,10 +160,15 @@ check_login(Username, Password):-
         ).
 
 checkpoint(Key, Checkpoint):-
-        select(Connection,
-               setup_call_cleanup(odbc_prepare(Connection, 'SELECT checkpoint FROM checkpoint WHERE key = ?', [default], Statement, []),
-                                  odbc_execute(Statement, [Key], row(Checkpoint)),
-                                  odbc_free_statement(Statement))).
+        ( select(Connection,
+                 setup_call_cleanup(odbc_prepare(Connection, 'SELECT checkpoint FROM checkpoint WHERE key = ?', [default], Statement, []),
+                                    odbc_execute(Statement, [Key], row(Checkpoint)),
+                                    odbc_free_statement(Statement)))->
+            true
+        ; otherwise->
+            transaction(Key, _, true),
+            checkpoint(Key, Checkpoint)
+        ).
 
 :-meta_predicate(select(?, 0)).
 select(Connection, Goal):-        
