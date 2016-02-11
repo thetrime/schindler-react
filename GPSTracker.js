@@ -17,8 +17,13 @@ var GPSTracker =
             {
                 var that = this;
                 // Check it immediately on startup, then every 2 minutes thereafter
+                console.log("Checking the first time");
                 navigator.geolocation.getCurrentPosition(that.updatePosition.bind(that));
-                setInterval(function() {navigator.geolocation.getCurrentPosition(that.updatePosition.bind(that));}, 120000);
+                setInterval(function()
+                            {
+                                console.log("Checking a subsequent time");
+                                navigator.geolocation.getCurrentPosition(that.updatePosition.bind(that));
+                            }, 120000);
             }
         },
         
