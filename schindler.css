@@ -162,6 +162,11 @@ html, body
     background: lightgray;
 }
 
+.info_callout
+{
+    background: darkgray;
+}
+
 .horizontal_layout
 {
     -webkit-box-orient: horizontal;

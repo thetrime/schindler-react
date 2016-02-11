@@ -43,7 +43,7 @@ SchindlerStore.dispatchToken = AppDispatcher.register(function(event)
                                                           if (event.operation == "got_item" && event.data.location == "unknown")
                                                           {
                                                               current_view = "select_aisle";
-                                                              pending_item = event.data.name;
+                                                              pending_item = event.data;
                                                               SchindlerStore.emitChange();
                                                           }
                                                           if (event.operation == "set_item_location")

@@ -46,6 +46,7 @@ module.exports = React.createClass(
         render: function()
         {
             return (<div className="vertical_layout vertical_fill">
+                    <div className="horizontal_fill info_callout">Where did you get {this.props.item.name}?</div>
                     <SearchBox filterText={this.state.filterText} redoSearch={this.redoSearch}/>
                     <AisleTable aisles={this.state.aisles} filterText={this.state.filterText} redoSearch={this.redoSearch} store={StoreStore.getCurrentStore()} item={this.props.item} className="horizontal_fill vertical_fill"/> 
                     </div>);
