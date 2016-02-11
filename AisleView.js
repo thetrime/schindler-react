@@ -3,6 +3,7 @@ var SearchBox = require('./SearchBox');
 var AisleTable = require('./AisleTable');
 var ServerConnection = require('./ServerConnection');
 var StoreStore = require('./StoreStore');
+var Callout = require('./Callout');
 
 function getStateFromStore()
 {
@@ -46,7 +47,7 @@ module.exports = React.createClass(
         render: function()
         {
             return (<div className="vertical_layout vertical_fill">
-                    <div className="horizontal_fill info_callout">Where did you get {this.props.item.name}?</div>
+                    <Callout name={this.props.item.name}/>
                     <SearchBox filterText={this.state.filterText} redoSearch={this.redoSearch}/>
                     <AisleTable aisles={this.state.aisles} filterText={this.state.filterText} redoSearch={this.redoSearch} store={StoreStore.getCurrentStore()} item={this.props.item} className="horizontal_fill vertical_fill"/> 
                     </div>);

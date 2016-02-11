@@ -15,7 +15,7 @@ module.exports = React.createClass(
             AppDispatcher.dispatch({operation:"set_item_location",
                                     origin:"client",
                                     data:{location:aisle.name,
-                                          item:this.props.item,
+                                          item:this.props.item.name,
                                           store:this.props.store}});
             // Also delete the item from the list
             AppDispatcher.dispatch({operation:"got_item",
@@ -29,12 +29,12 @@ module.exports = React.createClass(
             AppDispatcher.dispatch({operation:"set_item_location",
                                     origin:"client",
                                     data:{location:aisle.name,
-                                          item:this.props.item,
+                                          item:this.props.item.name,
                                           store:this.props.store}});
             // Also delete the item from the list
             AppDispatcher.dispatch({operation:"got_item",
-                                    data:{location:aisle,
-                                          name:this.props.item}});
+                                    data:{location:aisle.name,
+                                          name:this.props.item.name}});
 
         },
         render: function()

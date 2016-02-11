@@ -11,7 +11,8 @@ module.exports = React.createClass(
         addItem: function(item)
         {
             AppDispatcher.dispatch({operation:"new_item",
-                                    data:{name:item.name}});
+                                    data:{name:item.name,
+                                          location:"unknown"}});
             this.props.redoSearch('');
         },
         wantItem: function(item)
