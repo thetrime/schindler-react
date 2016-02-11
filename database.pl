@@ -42,9 +42,14 @@ end_transaction(Key, Connection, !, _):-
 
 update_checkpoint(Connection, Key):-
         uuid(UUID),                
-        % This is specific to SQLite
-        setup_call_cleanup(odbc_prepare(Connection, 'INSERT OR REPLACE INTO checkpoint(key, checkpoint) VALUES (?, ?)', [default, default], Statement, []),
+        delete_checkpoint(Connection, Key),        
+        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO checkpoint(key, checkpoint) VALUES (?, ?)', [default, default], Statement, []),
                            odbc_execute(Statement, [Key, UUID], _),
+                           odbc_free_statement(Statement)).
+
+delete_checkpoint(Connection, Key):-
+         setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM checkpoint WHERE key = ?', [default], Statement, []),
+                           odbc_execute(Statement, [Key], _),
                            odbc_free_statement(Statement)).
 
 
