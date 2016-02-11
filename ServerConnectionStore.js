@@ -2,7 +2,7 @@ var AppDispatcher = require('./AppDispatcher');
 var assign = require('object-assign');
 var EventEmitter = require('events').EventEmitter;
 
-var status = "disconnected";
+var status = "new";
 
 var ServerConnectionStore = assign({},
                                    EventEmitter.prototype,

@@ -22,7 +22,7 @@ module.exports = React.createClass(
         
         render: function()
         {
-            if (this.state.status == "connected")
+            if (this.state.status == "connected" || this.state.status == "new")
                 return (<div/>);
             else
                 return (<div className="connection_bar">Reestablishing connection...</div>);
