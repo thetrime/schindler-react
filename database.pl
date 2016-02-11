@@ -268,15 +268,29 @@ upgrade_schema_from(Connection, 0):-
         odbc_query(Connection, 'INSERT INTO item(key, name) VALUES(\'matt\', \'durian\')', _),
         odbc_query(Connection, 'INSERT INTO item(key, name) VALUES(\'matt\', \'mango\')', _),
         odbc_query(Connection, 'INSERT INTO item(key, name) VALUES(\'matt\', \'worms\')', _),
-
+        
         odbc_query(Connection, 'INSERT INTO known_item_location(key, item, store, location) VALUES(\'matt\', \'apple\', \'qfc\', \'produce\')', _),
         odbc_query(Connection, 'INSERT INTO known_item_location(key, item, store, location) VALUES(\'matt\', \'apple\', \'tesco\', \'produce\')', _),
-        odbc_query(Connection, 'INSERT INTO known_item_location(key, item, store, location) VALUES(\'matt\', \'apple\', \'home\', \'lounge\')', _),
+        %odbc_query(Connection, 'INSERT INTO known_item_location(key, item, store, location) VALUES(\'matt\', \'apple\', \'home\', \'lounge\')', _),
         
         odbc_query(Connection, 'INSERT INTO known_item_location(key, item, store, location) VALUES(\'matt\', \'orange\', \'qfc\', \'produce\')', _),
-        odbc_query(Connection, 'INSERT INTO known_item_location(key, item, store, location) VALUES(\'matt\', \'orange\', \'tesco\', \'produce\')', _),
+        odbc_query(Connection, 'INSERT INTO known_item_location(key, item, store, location) VALUES(\'matt\', \'orange\', \'tesco\', \'produce\')', _).
         
-        odbc_query(Connection, 'INSERT INTO known_item_location(key, item, store, location) VALUES(\'matt\', \'pillow\', \'home\', \'bathroom\')', _).
+        %odbc_query(Connection, 'INSERT INTO known_item_location(key, item, store, location) VALUES(\'matt\', \'pillow\', \'home\', \'bathroom\')', _).
 
 upgrade_schema_from(Connection, 1):-
         odbc_query(Connection, 'CREATE TABLE users(username VARCHAR, password VARCHAR)', _).
+
+set_random_locations:-
+        transaction(matt, Connection, set_random_locations(Connection)).
+
+set_random_locations(Connection):-
+        % Create random locations for everything.
+        findall(Aisle,
+                aisle(matt, Aisle, home),
+                Aisles),
+        forall(item(matt, Item),
+               ( random_member(Location, Aisles),
+                 insert(Connection, known_item_location(matt, Item, home, Location))
+               )),
+        odbc_end_transaction(Connection, commit).
