@@ -49,7 +49,7 @@ module.exports = React.createClass(
             var table = this;
             this.props.aisles.sort().forEach(function(aisle)
                                              {
-                                                 rows.push(<Item item={aisle} key={aisle.name} onClick={table.selectAisle} label='Select Aisle'/>);
+                                                 rows.push(<Item item={aisle} key={aisle.name} onClick={table.selectAisle} label='select'/>);
                                             });
             return (<div className="table_container vertical_fill">
                     <table className="item_table">

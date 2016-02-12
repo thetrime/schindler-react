@@ -26,7 +26,10 @@ module.exports = React.createClass(
             AppDispatcher.dispatch({operation:"got_item",
                                     data:{name:item.name,
                                           location:item.location}});
-        },       
+        },
+        changeItemSettings : function()
+        {
+        },
         render: function()
         {
             var rows = [];
@@ -64,7 +67,7 @@ module.exports = React.createClass(
             var table = this;
             if (filter != '' && !exactMatch)
             {
-                rows.push(<NewItem name={filter} key={filter} addItem={table.addItem} label="Add New Item"/>);
+                rows.push(<NewItem name={filter} key={filter} addItem={table.addItem} label="add"/>);
             }
             Object.keys(groups).sort().forEach(function(group)
                            {
@@ -74,7 +77,8 @@ module.exports = React.createClass(
                                                                rows.push(<Item item={item}
                                                                          key={item.name}
                                                                          onClick={item.on_list?table.gotItem:table.wantItem}
-                                                                         label={item.on_list?"Got It!":"Add Item"}/>);
+                                                                         label={item.on_list?"got_it":"add"}
+                                                                         settings={(item.on_list)?table.changeItemSettings:undefined}/>);
                                                            });
                            });
             return (<div className="table_container vertical_fill">

@@ -15,6 +15,6 @@ A replacement for Schindler v1, a grocery item organisational tool.
    swipl -q -f server.pl -g run
 
 ---+++ Start the server in a way that ignores SIGHUP (ie from an ssh session)
-   swipl -q -f server.pl -g run -t wait
+   nohup swipl -q -f server.pl -g run -t wait >& /dev/null &
 
 Then go to localhost:9999 to see the app!

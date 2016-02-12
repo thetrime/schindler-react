@@ -10,6 +10,6 @@ module.exports = React.createClass(
         
         render: function()
         {
-            return (<button onClick={this.logout} className="logout_button">Logout</button>);
+            return (<button onClick={this.logout} className="user_button"></button>);
         }
     });

@@ -6,7 +6,7 @@ module.exports = React.createClass(
         render: function()
         {
             return (<tr>
-                    <th colSpan="2">
+                    <th colSpan="3">
                     {this.props.location}
                     </th>
                     </tr>);

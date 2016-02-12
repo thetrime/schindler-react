@@ -11,9 +11,21 @@ module.exports = React.createClass(
         render: function()
         {
             var label = this.props.label;
-            return (<tr>
-                    <td>{this.props.item.name}</td>
-                    <td className="button_column"><button className="app_button" onClick={this.onClick}>{label}</button></td>
-                    </tr>);
+            var className = "app_button " + this.props.label + "_button";
+            if (this.props.settings === undefined)
+            {
+                return (<tr>
+                        <td>{this.props.item.name}</td>
+                        <td className = "button_column" colSpan="2"><button className={className} onClick={this.onClick}></button></td>
+                        </tr>);
+            }
+            else
+            {
+                return (<tr>
+                        <td>{this.props.item.name}</td>
+                        <td className = "settings_column"><button className="app_button settings_button" onClick={this.settings}></button></td>
+                        <td className = "button_column"><button className={className} onClick={this.onClick}></button></td>
+                        </tr>);
+            }
         }
     });

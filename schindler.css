@@ -20,15 +20,17 @@ th
     width: 100%;
 }
 
-.app_button
-{
-    float: right;
-}
 
 .button_column
 {
-    width: 100px;
+    width: 26pt;
 }
+
+.settings_column
+{
+    width: 26pt;
+}
+
 
 body
 {
@@ -120,15 +122,68 @@ html, body
     x-width: 75%;
 }
 
-.logout_button
+
+.app_button
+{
+    float: right;
+    border: 1px solid black;
+    background: white;
+    margin: 4px 4px 4px 4px;
+    -webkit-border-radius: 5px;
+    background-size: cover;
+    background-origin: content-box;
+    background-repeat: no-repeat;
+    padding: 5px;
+    height:24pt;
+    width: 26pt;
+
+}
+
+
+.got_it_button
+{
+    background-image:url('/tick.png');
+}
+
+
+.add_button
+{
+    background-image:url('/add.png');
+}
+
+.select_button
+{
+    background-image:url('/select.png');
+}
+
+
+.settings_button
 {
     border: 1px solid black;
-    -webkit-border-radius: 15px;
+    background: white;
+    x-margin: 4pt 5px 5px 4pt;
+    -webkit-border-radius: 5px;
+    background-image:url('/settings.png');
+    background-size: cover;
+    background-origin: content-box;
+    background-repeat: no-repeat;
+    padding: 5px;
+    height:24pt;
+    width: 26pt;
+}
+
+.user_button
+{
+    border: 1px solid black;
+    -webkit-border-radius: 2px;
     -webkit-appearance: none;
     position: absolute;
-    height: 24pt;
+    height:24pt;
+    width: 26pt;
     right: 0px;
     margin: 4pt 5px 5px 4pt;
+    background-image:url('/user.png');
+    background-size: cover;
 }
 
 .login_parent
