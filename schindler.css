@@ -86,8 +86,6 @@ html, body
     {
         font-size: 12pt;
     }
-
-
 }
 
 .shop_name
@@ -136,7 +134,11 @@ html, body
     padding: 5px;
     height:24pt;
     width: 26pt;
+}
 
+.app_button:active
+{
+    background-color: #aaaaaa;
 }
 
 
