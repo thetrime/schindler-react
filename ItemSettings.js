@@ -38,10 +38,9 @@ module.exports = React.createClass(
         defer: function()
         {
             AppDispatcher.dispatch({operation:"defer",
-                                    data:{item:this.props.item.name,
+                                    data:{name:this.props.item.name,
                                           store:StoreStore.getCurrentStore()}});
             this.setState({state:"collapsed"});
-
         },        
         render: function()
         {
@@ -51,7 +50,7 @@ module.exports = React.createClass(
                 return (<div className="vertical_layout">
                         <button className="setting_button" onClick={this.beyond}>Hide for this store</button>
                         <button className="setting_button" onClick={this.rehome}>Remove from current location</button>
-                        {/*<button className="setting_button" onClick={this.defer}>Get it next time</button>*/}
+                        <button className="setting_button" onClick={this.defer}>Get it next time</button>
                         <button className="setting_button" onClick={this.collapse}>Done</button>
                         </div>);
         }

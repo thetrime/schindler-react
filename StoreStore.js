@@ -6,8 +6,8 @@ var GPSTracker = require('./GPSTracker');
 var stores = [];
 var all_items = [];
 var current_list = [];
-
 var current_store = 'home';
+var deferred_items = [];
 
 function setCurrentList(i)
 {
@@ -34,6 +34,15 @@ function relocateItems()
               {
                   addItemToCurrentList(item);
               });
+}
+
+function restoreDeferredItems()
+{
+    deferred_items.forEach(function(item)
+                           {
+                               addItemToCurrentList({name:item});
+                           });
+    deferred_items = [];    
 }
 
 function getNearestStoreTo(position)
@@ -152,6 +161,10 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                               localStorage.setItem("checkpoint", event.data.checkpoint);
                                                               localStorage.setItem("checkpoint_data", JSON.stringify(event.data));
                                                           }
+                                                          if (localStorage.getItem("deferred_items") == undefined)
+                                                              deferred_items = [];
+                                                          else
+                                                              deferred_items = JSON.parse(localStorage.getItem("deferred_items"));
                                                           stores = {home:{location: {latitude:0,
                                                                                      longitude:0},
                                                                           aisles: [],
@@ -295,6 +308,7 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                           console.log('Store is now ' + event.data.name);                                                          
                                                           current_store = event.data.name;
                                                           relocateItems();
+                                                          restoreDeferredItems();
                                                           StoreStore.emitChange();
                                                       }
                                                       if (event.operation == "moved")
@@ -303,6 +317,17 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                           if (new_store != current_store)
                                                           {
                                                               current_store = new_store
+                                                              StoreStore.emitChange();
+                                                          }
+                                                          restoreDeferredItems();
+                                                      }
+                                                      if (event.operation == "defer")
+                                                      {
+                                                          if (deferred_items.indexOf(event.data.name) == -1)
+                                                          {
+                                                              deferred_items.push(event.data.name);
+                                                              localStorage.setItem("deferred_items", JSON.stringify(deferred_items));
+                                                              current_list = current_list.filter(function(a) {return a.name != event.data.name});
                                                               StoreStore.emitChange();
                                                           }
                                                       }
