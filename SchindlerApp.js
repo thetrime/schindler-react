@@ -9,6 +9,7 @@ var SchindlerStore = require('./SchindlerStore');
 var LoginView = require('./LoginView');
 var LoginInfo = require('./LoginInfo');
 var StoreView = require('./StoreView');
+var ItemSettingsView = require('./ItemSettingsView');
 module.exports = React.createClass(
     {
         getInitialState: function()

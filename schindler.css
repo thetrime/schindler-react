@@ -1,7 +1,8 @@
-th
+.location
 {
     background: grey;
     color: white;
+    margin-bottom: 5px;
 }
 
 .item_table
@@ -21,14 +22,10 @@ th
 }
 
 
-.button_column
-{
-    width: 26pt;
-}
 
 .settings_column
 {
-    width: 26pt;
+    x-width: 26pt;
 }
 
 
@@ -120,6 +117,10 @@ html, body
     x-width: 75%;
 }
 
+.setting_button
+{
+    float: right;
+}
 
 .app_button
 {
@@ -292,4 +293,23 @@ html, body
     display: -webkit-flex;
     -webkit-align-items: center;
     -webkit-justify-content: center;
+}
+
+/* popup */
+
+.popup_dialog
+{
+    -webkit-border-radius: 15px;
+    border: solid 3px black;
+    position: absolute;
+    left: 40px;
+    top: 50px;
+    background: white;
+    padding: 5px;
+}
+
+.dialog_title
+{
+    font-weight: bold;
+    font-size: 80%;
 }

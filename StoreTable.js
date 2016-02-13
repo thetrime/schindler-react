@@ -47,21 +47,15 @@ module.exports = React.createClass(
             var exactMatch = false;
             if (filter != '' && !exactMatch)
             {
-                rows.push(<NewItem name={filter} key={filter} addItem={this.newStore} label="Create New Store"/>);
+                rows.push(<NewItem name={filter} key={filter} addItem={this.newStore} label="add"/>);
             }
             var table = this;
             this.props.stores.sort().forEach(function(store)
                                              {
-                                                 rows.push(<Item item={store} key={store.name} onClick={table.selectStore} label='Select Store'/>);
+                                                 rows.push(<Item item={store} key={store.name} onClick={table.selectStore} label='select'/>);
                                             });
             return (<div className="table_container vertical_fill">
-                    <table className="item_table">
-                    <thead>
-                    </thead>
-                    <tbody>
                     {rows}
-                    </tbody>
-                    </table>
                     </div>);
         }
     });

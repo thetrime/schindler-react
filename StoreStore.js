@@ -175,6 +175,13 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                       if (event.operation == "set_item_location")
                                                       {
                                                           stores[event.data.store].item_locations[event.data.item] = event.data.location;
+                                                          // Also set the location of the item on the current list, if present
+                                                          // This may trigger a relayout of the table if the item has moved
+                                                          current_list.forEach(function(item)
+                                                                               {
+                                                                                   if (item.name == event.data.item)
+                                                                                       item.location = event.data.location;
+                                                                               });
                                                           StoreStore.emitChange();
                                                           // Also advise the server of this realization
                                                           if (event.origin == 'client')
@@ -279,7 +286,7 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                       }
                                                       if (event.operation == "set_store")
                                                       {
-                                                          console.log('Store is now ' + event.data.name);
+                                                          console.log('Store is now ' + event.data.name);                                                          
                                                           current_store = event.data.name;
                                                           relocateItems();
                                                           StoreStore.emitChange();

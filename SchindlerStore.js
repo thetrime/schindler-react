@@ -5,9 +5,6 @@ var ServerConnection = require('./ServerConnection');
 var StoreStore = require('./StoreStore');
 
 var current_view = localStorage.getItem("credentials") == null?"login":"shop";
-console.log(localStorage.getItem("credentials"));
-console.log('vs');
-console.log(null);
 var pending_item = {};
 
 var SchindlerStore = assign({},

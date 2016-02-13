@@ -5,11 +5,9 @@ module.exports = React.createClass(
     {
         render: function()
         {
-            return (<tr>
-                    <th colSpan="3">
+            return (<div className="horizontal_fill location">
                     {this.props.location}
-                    </th>
-                    </tr>);
+                    </div>);
                     
         }
     });
