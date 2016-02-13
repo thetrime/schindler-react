@@ -86,13 +86,7 @@ module.exports = React.createClass(
                            });
             
             return (<div className="table_container vertical_fill">
-                    <table className="item_table">
-                    <thead>
-                    </thead>
-                    <tbody>
                     {rows}
-                    </tbody>
-                    </table>
                     </div>);
         }
     });

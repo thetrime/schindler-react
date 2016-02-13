@@ -1,4 +1,4 @@
-th
+.location
 {
     background: grey;
     color: white;
@@ -21,10 +21,6 @@ th
 }
 
 
-.button_column
-{
-    width: 26pt;
-}
 
 .settings_column
 {
