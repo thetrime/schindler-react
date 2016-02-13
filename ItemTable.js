@@ -72,17 +72,22 @@ module.exports = React.createClass(
                 rows.push(<NewItem name={filter} key={filter} addItem={table.addItem} label="add"/>);
             }
             Object.keys(groups).sort().forEach(function(group)
-                           {
-                               rows.push(<Location key={groups[group].location} location={groups[group].location}/>);
-                               groups[group].items.forEach(function(item)
-                                                           {
-                                                               rows.push(<Item item={item}
-                                                                         key={item.name}
-                                                                         onClick={item.on_list?table.gotItem:table.wantItem}
-                                                                         label={item.on_list?"got_it":"add"}
-                                                                         settings={(item.on_list)?table.changeItemSettings:undefined}/>);
-                                                           });
-                           });
+                                               {
+                                                   if (group == "$beyond" && filter == '')
+                                                       return;
+                                                   if (group == "$beyond" && filter != '')
+                                                       rows.push(<Location key={groups[group].location} location="Not Available Here"/>);
+                                                   else
+                                                       rows.push(<Location key={groups[group].location} location={groups[group].location}/>);
+                                                   groups[group].items.forEach(function(item)
+                                                                               {
+                                                                                   rows.push(<Item item={item}
+                                                                                             key={item.name}
+                                                                                             onClick={item.on_list?table.gotItem:table.wantItem}
+                                                                                             label={item.on_list?"got_it":"add"}
+                                                                                             settings={(item.on_list)?table.changeItemSettings:undefined}/>);
+                                                                               });
+                                               });
             
             return (<div className="table_container vertical_fill">
                     {rows}

@@ -49,7 +49,7 @@ module.exports = React.createClass(
                 return (<button className="app_button settings_button" onClick={this.expand}></button>);
             else
                 return (<div className="vertical_layout">
-                        <button className="setting_button" onclick={this.beyond}>Hide for this store</button>
+                        <button className="setting_button" onClick={this.beyond}>Hide for this store</button>
                         <button className="setting_button" onClick={this.rehome}>Remove from current location</button>
                         <button className="setting_button" onClick={this.defer}>Get it next time</button>
                         <button className="setting_button" onClick={this.collapse}>^</button>

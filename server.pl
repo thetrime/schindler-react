@@ -153,10 +153,17 @@ handle_message(Key, set_item_location, Message):-
         Item = Message.item,
         Location = Message.location,
         Store = Message.store,
+        ( aisle(Key, Location, Store)->
+            true
+        ; otherwise->
+            handle_message(Key, new_aisle, _{name:Location,
+                                             store:Store})
+        ),
         transaction(Key,
                     Connection,
-                    ( delete(Connection, known_item_location(Key, Item, Store, Location)),
-                      insert(Connection, known_item_location(Key, Item, Store, Location)))),
+                    ( delete(Connection, known_item_location(Key, Item, Store)),
+                      insert(Connection, known_item_location(Key, Item, Store, Location))
+                    )),
         ws_send_message(Key, set_item_location, Message).
 
 
@@ -166,7 +173,9 @@ handle_message(Key, new_store, Message):-
         Longitude = Message.longitude,
         transaction(Key,
                     Connection,
-                    insert(Connection, store(Key, Name, Latitude, Longitude))),
+                    ( insert(Connection, store(Key, Name, Latitude, Longitude)),
+                      insert(Connection, aisle(Key, '$beyond', Name))
+                    )),
         ws_send_message(Key, new_store, Message).
 
 handle_message(Key, set_store_location, Message):-

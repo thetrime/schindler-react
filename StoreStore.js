@@ -55,6 +55,21 @@ function getNearestStoreTo(position)
     return store;
 }
 
+function ensureAisleExists(store, aisle)
+{
+    var found = false;
+    for (var i = 0; i < stores[store].aisles.length; i++)
+    {
+        if (stores[store].aisles[i].name == aisle)
+        {
+            found = true;
+            break;
+        }
+    }
+    if (!found)
+        stores[store].aisles.push({name:aisle});
+}
+
 var StoreStore = assign({},
                         EventEmitter.prototype,
                         {
@@ -182,6 +197,7 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                                                    if (item.name == event.data.item)
                                                                                        item.location = event.data.location;
                                                                                });
+                                                          ensureAisleExists(event.data.store, event.data.location);
                                                           StoreStore.emitChange();
                                                           // Also advise the server of this realization
                                                           if (event.origin == 'client')
@@ -269,17 +285,7 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                       }
                                                       if (event.operation == "new_aisle")
                                                       {
-                                                          var found = false;
-                                                          for (var i = 0; i < stores[event.data.store].aisles.length; i++)
-                                                          {
-                                                              if (stores[event.data.store].aisles[i].name == event.data.name)
-                                                              {
-                                                                  found = true;
-                                                                  break;
-                                                              }
-                                                          }
-                                                          if (!found)
-                                                              stores[event.data.store].aisles.push({name:event.data.name});
+                                                          ensureAisleExists(event.data.store, event.data.location);
                                                           if (event.origin == "client")
                                                               ServerConnection.sendMessage(event);
                                                           
