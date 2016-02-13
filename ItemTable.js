@@ -5,6 +5,7 @@ var Location = require('./Location');
 var Item = require('./Item');
 var NewItem = require('./NewItem');
 var StoreStore = require('./StoreStore');
+var PopupDialog = require('./PopupDialog');
 
 module.exports = React.createClass(
     {     
@@ -27,8 +28,10 @@ module.exports = React.createClass(
                                     data:{name:item.name,
                                           location:item.location}});
         },
-        changeItemSettings : function()
+        changeItemSettings : function(item)
         {
+             AppDispatcher.dispatch({operation:"change_item_settings",
+                                    data:{name:item.name}});
         },
         render: function()
         {
@@ -81,6 +84,7 @@ module.exports = React.createClass(
                                                                          settings={(item.on_list)?table.changeItemSettings:undefined}/>);
                                                            });
                            });
+            
             return (<div className="table_container vertical_fill">
                     <table className="item_table">
                     <thead>
