@@ -6,7 +6,8 @@ var ServerConnection = require('./ServerConnection');
 
 function getStateFromStore()
 {
-    return {items: StoreStore.getCurrentList()};
+    return {items: StoreStore.getCurrentList(),
+            all_items: StoreStore.getItemsForCurrentStore()};
 }
 
 
@@ -15,6 +16,7 @@ module.exports = React.createClass(
         getInitialState: function()
         {
             return {filterText: '',
+                    all_items: StoreStore.getItemsForCurrentStore(),
                     items: StoreStore.getCurrentList()};
         },
 
@@ -55,7 +57,7 @@ module.exports = React.createClass(
         {
             return (<div className="vertical_layout vertical_fill">
                     <SearchBox filterText={this.state.filterText} redoSearch={this.redoSearch} className="horizontal_fill"/>
-                    <ItemTable model={this.state.items} filterText={this.state.filterText} redoSearch={this.redoSearch} className="horizontal_fill vertical_fill"/>
+                    <ItemTable list_items={this.state.items} all_items={this.state.all_items} filterText={this.state.filterText} redoSearch={this.redoSearch} className="horizontal_fill vertical_fill"/>
                     </div>);
         }
     });

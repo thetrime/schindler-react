@@ -44,7 +44,7 @@ module.exports = React.createClass(
             var exactMatch = false;
             if (filter != '' && !exactMatch)
             {
-                rows.push(<NewItem name={filter} key={filter} addItem={this.addNewAisle} label="Add New Aisle"/>);
+                rows.push(<NewItem name={filter} key={filter} addItem={this.addNewAisle} label="add"/>);
             }
             var table = this;
             this.props.aisles.sort().forEach(function(aisle)
@@ -52,13 +52,7 @@ module.exports = React.createClass(
                                                  rows.push(<Item item={aisle} key={aisle.name} onClick={table.selectAisle} label='select'/>);
                                             });
             return (<div className="table_container vertical_fill">
-                    <table className="item_table">
-                    <thead>
-                    </thead>
-                    <tbody>
                     {rows}
-                    </tbody>
-                    </table>
                     </div>);
         }
     });

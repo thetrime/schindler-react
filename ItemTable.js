@@ -4,7 +4,6 @@ var ServerConnection = require('./ServerConnection');
 var Location = require('./Location');
 var Item = require('./Item');
 var NewItem = require('./NewItem');
-var StoreStore = require('./StoreStore');
 var PopupDialog = require('./PopupDialog');
 
 module.exports = React.createClass(
@@ -39,14 +38,14 @@ module.exports = React.createClass(
             var groups = {};
             var filter = this.props.filterText;
             var exactMatch = false;
-            var allItems = this.props.model;
+            var allItems = this.props.list_items;
             if (filter != '')
             {
-                // Need to determine which of these items are in this.props.model, and mark them appropriately so that we can
+                // Need to determine which of these items are in this.props.all_items, and mark them appropriately so that we can
                 // distinguish 'Add Item' from 'Got It!' and call the appropriate function when clicked
                 // FIXME: This is really inefficient. We must be able to do better...
-                allItems = StoreStore.getItemsForCurrentStore();
-                this.props.model.forEach(function(list_item)
+                allItems = this.props.all_items;
+                allItems.forEach(function(list_item)
                                          {
                                              for (var i = 0; i < allItems.length; i++)
                                              {
