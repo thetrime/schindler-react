@@ -51,8 +51,8 @@ module.exports = React.createClass(
                 return (<div className="vertical_layout">
                         <button className="setting_button" onClick={this.beyond}>Hide for this store</button>
                         <button className="setting_button" onClick={this.rehome}>Remove from current location</button>
-                        <button className="setting_button" onClick={this.defer}>Get it next time</button>
-                        <button className="setting_button" onClick={this.collapse}>^</button>
+                        {/*<button className="setting_button" onClick={this.defer}>Get it next time</button>*/}
+                        <button className="setting_button" onClick={this.collapse}>Done</button>
                         </div>);
         }
     });
