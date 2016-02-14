@@ -198,7 +198,7 @@ get_connection_1(Connection):-
 get_connection_1(Connection):-
         odbc_connect(-,
                      Connection,
-                     [driver_string('DRIVER={Sqlite3};Database=schindler.db'),
+                     [driver_string('DRIVER={Sqlite3};Database=schindler.db;FKSupport=True'),
                       silent(true),
                       null({null}),
                       auto_commit(false)]),
@@ -224,10 +224,10 @@ upgrade_schema_from(Connection, 0):-
         odbc_query(Connection, 'CREATE TABLE schema(version INTEGER)', _),
         odbc_query(Connection, 'INSERT INTO schema(version) VALUES (1)', _),
         odbc_query(Connection, 'CREATE TABLE item(key VARCHAR, name VARCHAR)', _),
-        odbc_query(Connection, 'CREATE TABLE list_item(key VARCHAR, name VARCHAR)', _),
+        odbc_query(Connection, 'CREATE TABLE list_item(key VARCHAR, name VARCHAR, FOREIGN KEY(key, name) REFERENCES item(key, name))', _),
         odbc_query(Connection, 'CREATE TABLE store(key VARCHAR, name VARCHAR, latitude VARCHAR, longitude VARCHAR)', _),
-        odbc_query(Connection, 'CREATE TABLE aisle(key VARCHAR, name VARCHAR, store VARCHAR)', _),
-        odbc_query(Connection, 'CREATE TABLE known_item_location(key VARCHAR, item VARCHAR, store VARCHAR, location VARCHAR)', _),
+        odbc_query(Connection, 'CREATE TABLE aisle(key VARCHAR, name VARCHAR, store VARCHAR, FOREIGN KEY(key, store) REFERENCES store(key, name))', _),
+        odbc_query(Connection, 'CREATE TABLE known_item_location(key VARCHAR, item VARCHAR, store VARCHAR, location VARCHAR, FOREIGN KEY(key, item) REFERENCES item(key, name), FOREIGN KEY(key, store) REFERENCES store(key, store), FOREIGN KEY(key, store, location) REFERENCES aisle(key, store, name))', _),
         odbc_query(Connection, 'CREATE TABLE checkpoint(key VARCHAR, checkpoint VARCHAR)', _),
 
         % Insert some random data
@@ -297,6 +297,7 @@ upgrade_schema_from(Connection, 0):-
 
 upgrade_schema_from(Connection, 1):-
         odbc_query(Connection, 'CREATE TABLE users(username VARCHAR, password VARCHAR)', _).
+
 
 set_random_locations:-
         transaction(matt, Connection, set_random_locations(Connection)).
