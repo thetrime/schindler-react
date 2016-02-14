@@ -51,14 +51,20 @@ module.exports = React.createClass(
                 // distinguish 'Add Item' from 'Got It!' and call the appropriate function when clicked
                 // FIXME: This is really inefficient. We must be able to do better...
                 allItems = this.props.all_items;
+                var listItems = this.props.list_items;
+                console.log('Searching');
                 allItems.forEach(function(list_item)
+                                 {
+                                     list_item.on_list = false;
+                                     for (var i = 0; i < listItems.length; i++)
+                                     {
+                                         if (listItems[i].name == list_item.name)
                                          {
-                                             for (var i = 0; i < allItems.length; i++)
-                                             {
-                                                 if (allItems[i].name == list_item.name)
-                                                     allItems[i].on_list = true;
-                                             }
-                                         });
+                                             console.log("Found " + listItems[i].name);
+                                             list_item.on_list = true;
+                                         }
+                                     }
+                                 });
             }
             allItems.forEach(function(item)
                              {
