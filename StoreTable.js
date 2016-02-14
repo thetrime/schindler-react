@@ -3,6 +3,7 @@ var AppDispatcher = require('./AppDispatcher');
 var ServerConnection = require('./ServerConnection');
 var NewItem = require('./NewItem');
 var Item = require('./Item');
+var SchindlerStore = require('./SchindlerStore');
 var GPSTracker = require('./GPSTracker');
 
 module.exports = React.createClass(
@@ -23,6 +24,12 @@ module.exports = React.createClass(
             // Also change the current store
             AppDispatcher.dispatch({operation:"set_store",
                                     data:{name:store.name}});
+            // ALSO re-submit that we have the pending item, if one exists
+            var pending = SchindlerStore.getPendingItem();
+            if (pending.name != undefined)
+                AppDispatcher.dispatch({operation:"got_item",
+                                        data:{name:pending.name,
+                                              location:"unknown"}});
         },
         
         selectStore: function(store)
@@ -38,6 +45,13 @@ module.exports = React.createClass(
             // Also change the current store
             AppDispatcher.dispatch({operation:"set_store",
                                     data:{name:store.name}});
+            // ALSO re-submit that we have the pending item, if one exists
+            var pending = SchindlerStore.getPendingItem();
+            if (pending.name != undefined)
+                AppDispatcher.dispatch({operation:"got_item",
+                                        data:{name:pending.name,
+                                              location:"unknown"}});
+
 
         },
         render: function()

@@ -96,31 +96,35 @@ module.exports = React.createClass(
                                                                                                          var settings = [];
                                                                                                          if (item.on_list)
                                                                                                          {
-                                                                                                             settings = [{label:'Hide for this store',
-                                                                                                                          handler:function()
-                                                                                                                          {
-                                                                                                                              AppDispatcher.dispatch({operation:"set_item_location",
-                                                                                                                                                      origin:"client",
-                                                                                                                                                      data:{location:"$beyond",
-                                                                                                                                                            item:item.name,
-                                                                                                                                                            store:StoreStore.getCurrentStore()}});
-                                                                                                                          }},
-                                                                                                                         {label:'Remove from current location',
-                                                                                                                          handler:function()
-                                                                                                                          {
-                                                                                                                              AppDispatcher.dispatch({operation:"set_item_location",
-                                                                                                                                                      origin:"client",
-                                                                                                                                                      data:{location:"unknown",
-                                                                                                                                                            item:item.name,
-                                                                                                                                                            store:StoreStore.getCurrentStore()}});
-                                                                                                                          }},
-                                                                                                                         {label:'Get it next time',
-                                                                                                                          handler: function()
-                                                                                                                          {
-                                                                                                                              AppDispatcher.dispatch({operation:"defer",
-                                                                                                                                                      data:{name:item.name,
-                                                                                                                                                            store:StoreStore.getCurrentStore()}});
-                                                                                                                          }}];
+                                                                                                             var store = StoreStore.getCurrentStore();
+                                                                                                             if (store != undefined)
+                                                                                                             {
+                                                                                                                 settings.push({label:'Hide for this store',
+                                                                                                                                handler:function()
+                                                                                                                                {
+                                                                                                                                    AppDispatcher.dispatch({operation:"set_item_location",
+                                                                                                                                                            origin:"client",
+                                                                                                                                                            data:{location:"$beyond",
+                                                                                                                                                                  item:item.name,
+                                                                                                                                                                  store:store}});
+                                                                                                                                }});
+                                                                                                             
+                                                                                                                 settings.push({label:'Remove from current location',
+                                                                                                                                handler:function()
+                                                                                                                                {
+                                                                                                                                    AppDispatcher.dispatch({operation:"set_item_location",
+                                                                                                                                                            origin:"client",
+                                                                                                                                                            data:{location:"unknown",
+                                                                                                                                                                  item:item.name,
+                                                                                                                                                                  store:store}});
+                                                                                                                                }});
+                                                                                                             }
+                                                                                                             settings.push({label:'Get it next time',
+                                                                                                                            handler: function()
+                                                                                                                            {
+                                                                                                                                AppDispatcher.dispatch({operation:"defer",
+                                                                                                                                                        data:{name:item.name}});
+                                                                                                                            }});
                                                                                                          }
                                                                                                          else
                                                                                                              settings = undefined;

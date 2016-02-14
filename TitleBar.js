@@ -7,7 +7,7 @@ module.exports = React.createClass(
     {
         getInitialState: function()
         {
-            return {currentStore: StoreStore.getCurrentStore()};
+            return {current_store: StoreStore.getCurrentStore()};
         },
 
         changeStore: function()
@@ -18,10 +18,13 @@ module.exports = React.createClass(
 
         render: function()
         {
+            var label = this.state.current_store;
+            if (label == undefined)
+                label = "Unknown Store";
             return (<div className="title_bar horizontal_fill horizontal_layout">
                     <div className="horizontal_fill horizontal_layout">
                     <div className="shop_name horizontal_fill horizontal_layout">
-                    <a href="#" className="shop_name_label horizontal_fill" onClick={this.changeStore}>{this.state.currentStore}</a></div>
+                    <a href="#" className="shop_name_label horizontal_fill" onClick={this.changeStore}>{label}</a></div>
                     </div>
                     <LoginInfo/>
                     </div>);
@@ -40,7 +43,7 @@ module.exports = React.createClass(
         
         onChange: function()
         {
-            this.setState({currentStore: StoreStore.getCurrentStore()});
+            this.setState({current_store: StoreStore.getCurrentStore()});
         }
         
     });

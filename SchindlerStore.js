@@ -42,16 +42,29 @@ var SchindlerStore = assign({},
 
 SchindlerStore.dispatchToken = AppDispatcher.register(function(event)
                                                       {
-                                                          if (event.operation == "got_item" && event.data.location == "unknown")
+                                                          if (event.operation == "got_item")
                                                           {
-                                                              current_view = "select_aisle";
-                                                              pending_item = event.data;
-                                                              SchindlerStore.emitChange();
-                                                          }                              
-                                                          if (event.operation == "got_item" && event.data.location != "unknown")
-                                                          {
-                                                              current_view = "shop";
-                                                              pending_item = {};
+                                                              if (event.data.location == null)
+                                                              {
+                                                                  // The user is insistent that they do not care - just delete the thing!
+                                                                  current_view = "shop";
+                                                                  pending_item = {};
+                                                              }
+                                                              else if (StoreStore.getCurrentStore() == undefined)
+                                                              {
+                                                                  current_view = "select_store";
+                                                                  pending_item = event.data;
+                                                              }
+                                                              else if (event.data.location == "unknown")
+                                                              {
+                                                                  current_view = "select_aisle";
+                                                                  pending_item = event.data;
+                                                              }                              
+                                                              else
+                                                              {
+                                                                  current_view = "shop";
+                                                                  pending_item = {};
+                                                              }
                                                               SchindlerStore.emitChange();
                                                           }
                                                           if (event.operation == "login_ok")
@@ -73,7 +86,7 @@ SchindlerStore.dispatchToken = AppDispatcher.register(function(event)
                                                           }
                                                           if (event.operation == "select_store")
                                                           {
-                                                              current_view = "select_store";                                                             
+                                                              current_view = "select_store";
                                                               SchindlerStore.emitChange();
                                                           }
                                                           if (event.operation == "logout")

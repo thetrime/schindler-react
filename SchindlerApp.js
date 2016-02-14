@@ -39,7 +39,7 @@ module.exports = React.createClass(
             else if (this.state.currentView == "select_store")
                 return (<div className="vertical_layout vertical_fill">
                         <TitleBar/>
-                        <StoreView/>
+                        <StoreView item={this.state.pending_item}/>
                         <ConnectionInfo/>
                         </div>);
             else if (this.state.currentView == "manage_store")

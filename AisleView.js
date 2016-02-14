@@ -5,6 +5,7 @@ var ServerConnection = require('./ServerConnection');
 var StoreStore = require('./StoreStore');
 var Callout = require('./Callout');
 var ManageAisleTable = require('./ManageAisleTable');
+var AppDispatcher = require('./AppDispatcher');
 var AisleManagementBanner = require('./AisleManagementBanner');
 
 function getStateFromStore()
@@ -53,7 +54,13 @@ module.exports = React.createClass(
                 // This mode is for when the user is being asked to identify the location
                 // of an item in a store
                 return (<div className="vertical_layout vertical_fill">
-                        <Callout name={this.props.item.name}/>
+                        <Callout label={"Where did you get " + this.props.item.name + "?"} not_sure={{label:"I forgot",
+                                                                                                      handler:function()
+                                                                                                      {
+                                                                                                          AppDispatcher.dispatch({operation:"got_item",
+                                                                                                                                  data:{location:null,
+                                                                                                                                        name:this.props.item.name}});
+                                                                                                      }.bind(this)}}/>
                         <SearchBox filterText={this.state.filterText} redoSearch={this.redoSearch}/>
                         <AisleTable aisles={this.state.aisles} filterText={this.state.filterText.trim()} redoSearch={this.redoSearch} store={StoreStore.getCurrentStore()} item={this.props.item} className="horizontal_fill vertical_fill"/> 
                         </div>);

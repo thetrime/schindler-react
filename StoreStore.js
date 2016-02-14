@@ -6,7 +6,7 @@ var GPSTracker = require('./GPSTracker');
 var stores = {};
 var all_items = [];
 var current_list = [];
-var current_store = 'home';
+var current_store = undefined;
 var deferred_items = [];
 
 function setCurrentList(i)
@@ -50,13 +50,14 @@ function restoreDeferredItems()
 function getNearestStoreTo(position)
 {
     var distance = -1;
-    var store = 'home';
+    var store;
     console.log("Getting nearest store:");    
     Object.keys(stores).forEach(function(storeName)
                                 {
                                     var d = GPSTracker.haversine(stores[storeName].location, position);
                                     console.log('Distance to ' + storeName + ' is ' + d + ' metres');
-                                    if (distance == -1 || d < distance)
+                                    if (d < 500 && d < distance)
+                                    //if (distance == -1 || d < distance)
                                     {
                                         distance = d;
                                         store = storeName;
@@ -110,6 +111,7 @@ var StoreStore = assign({},
                                 return store_names;
                             },
 
+                            // getCurrentStore returns undefined if we are not at any known store
                             getCurrentStore: function()
                             {
                                 return current_store;
@@ -117,7 +119,7 @@ var StoreStore = assign({},
 
                             getAisleFor: function(item)
                             {
-                                if (stores[current_store].item_locations[item] === undefined)
+                                if (current_store == undefined || stores[current_store].item_locations[item] === undefined)
                                     return "unknown";
                                 else
                                     return stores[current_store].item_locations[item];
@@ -126,6 +128,8 @@ var StoreStore = assign({},
                             getAislesForCurrentStore: function()
                             {
                                 var aisles = [];
+                                if (current_store == undefined)
+                                    return [];
                                 stores[current_store].aisles.forEach(function(aisle)
                                                                      {
                                                                          aisles.push({name:aisle.name});
@@ -138,7 +142,7 @@ var StoreStore = assign({},
                                 var located_items = [];
                                 all_items.forEach(function(item)
                                                   {
-                                                      if (stores[current_store].item_locations[item.name] === undefined)
+                                                      if (current_store == undefined || stores[current_store].item_locations[item.name] === undefined)
                                                           located_items.push({name:item.name,
                                                                               location:"unknown"});
                                                       else
