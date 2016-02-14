@@ -8,10 +8,6 @@ module.exports = React.createClass(
         {
             this.props.onClick(this.props.item);
         },
-        settings: function()
-        {
-            this.props.settings(this.props.item);
-        },
         render: function()
         {
             var label = this.props.label;
@@ -27,7 +23,7 @@ module.exports = React.createClass(
             {
                 return (<div className="horizontal_layout horizontal_fill">
                         <div className="horizontal_fill">{this.props.item.name}</div>
-                        <div className="settings_column"><ItemSettings item={this.props.item}/></div>
+                        <div className="settings_column"><ItemSettings item={this.props.item} settings={this.props.settings}/></div>
                         <div className="button_column"><button className={className} onClick={this.onClick}></button></div>
                         </div>);
             }

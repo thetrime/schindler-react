@@ -2,6 +2,7 @@ var React = require('react');
 var ServerConnection = require('./ServerConnection');
 var StoreStore = require('./StoreStore');
 var AppDispatcher = require('./AppDispatcher');
+var SettingButton = require('./SettingButton');
 
 module.exports = React.createClass(
     {
@@ -16,42 +17,24 @@ module.exports = React.createClass(
         collapse: function()
         {
             this.setState({state:"collapsed"});
-        },
-        beyond: function()
-        {
-            AppDispatcher.dispatch({operation:"set_item_location",
-                                    origin:"client",
-                                    data:{location:"$beyond",
-                                          item:this.props.item.name,
-                                          store:StoreStore.getCurrentStore()}});
-            this.setState({state:"collapsed"});
-        },
-        rehome: function()
-        {
-            AppDispatcher.dispatch({operation:"set_item_location",
-                                    origin:"client",
-                                    data:{location:"unknown",
-                                          item:this.props.item.name,
-                                          store:StoreStore.getCurrentStore()}});
-            this.setState({state:"collapsed"});
-        },
-        defer: function()
-        {
-            AppDispatcher.dispatch({operation:"defer",
-                                    data:{name:this.props.item.name,
-                                          store:StoreStore.getCurrentStore()}});
-            this.setState({state:"collapsed"});
-        },        
+        },       
         render: function()
         {
             if (this.state.state == "collapsed")
                 return (<button className="app_button settings_button" onClick={this.expand}></button>);
             else
+            {
+                var settings = [];
+                var item = this.props.item;
+                var collapse = this.collapse;
+                this.props.settings.forEach(function(setting)
+                                            {
+                                                settings.push(<SettingButton key={setting.label} handler={setting.handler} label={setting.label} collapse={collapse}/>);
+                                            });
+                settings.push(<button key="Done" className="setting_button" onClick={this.collapse}>Done</button>);
                 return (<div className="vertical_layout">
-                        <button className="setting_button" onClick={this.beyond}>Hide for this store</button>
-                        <button className="setting_button" onClick={this.rehome}>Remove from current location</button>
-                        <button className="setting_button" onClick={this.defer}>Get it next time</button>
-                        <button className="setting_button" onClick={this.collapse}>Done</button>
+                        {settings}
                         </div>);
+            }
         }
     });
