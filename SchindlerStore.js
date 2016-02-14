@@ -6,6 +6,7 @@ var StoreStore = require('./StoreStore');
 
 var current_view = localStorage.getItem("credentials") == null?"login":"shop";
 var pending_item = {};
+var managing_store = {};
 
 var SchindlerStore = assign({},
                             EventEmitter.prototype,
@@ -31,6 +32,10 @@ var SchindlerStore = assign({},
                                 getPendingItem: function()
                                 {
                                     return pending_item;
+                                },
+                                getManagingStore: function()
+                                {
+                                    return managing_store;
                                 }
                                 
                             });
@@ -84,6 +89,19 @@ SchindlerStore.dispatchToken = AppDispatcher.register(function(event)
                                                               current_view = "shop";
                                                               SchindlerStore.emitChange();
                                                           }
+                                                          if (event.operation == "manage_store")
+                                                          {
+                                                              current_view = "manage_store";
+                                                              managing_store = event.data.store;
+                                                              SchindlerStore.emitChange();
+                                                          }
+                                                          if (event.operation == "manage_store_complete")
+                                                          {
+                                                              current_view = "shop";
+                                                              managing_store = {};
+                                                              SchindlerStore.emitChange();
+                                                          }
+
                                                       });
 
 module.exports = SchindlerStore;

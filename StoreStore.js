@@ -300,7 +300,7 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                       }
                                                       if (event.operation == "new_aisle")
                                                       {
-                                                          ensureAisleExists(event.data.store, event.data.location);
+                                                          ensureAisleExists(event.data.store, event.data.name);
                                                           if (event.origin == "client")
                                                               ServerConnection.sendMessage(event);
                                                           

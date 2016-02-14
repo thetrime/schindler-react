@@ -4,6 +4,8 @@ var AisleTable = require('./AisleTable');
 var ServerConnection = require('./ServerConnection');
 var StoreStore = require('./StoreStore');
 var Callout = require('./Callout');
+var ManageAisleTable = require('./ManageAisleTable');
+var AisleManagementBanner = require('./AisleManagementBanner');
 
 function getStateFromStore()
 {
@@ -46,10 +48,25 @@ module.exports = React.createClass(
         
         render: function()
         {
-            return (<div className="vertical_layout vertical_fill">
-                    <Callout name={this.props.item.name}/>
-                    <SearchBox filterText={this.state.filterText} redoSearch={this.redoSearch}/>
-                    <AisleTable aisles={this.state.aisles} filterText={this.state.filterText.trim()} redoSearch={this.redoSearch} store={StoreStore.getCurrentStore()} item={this.props.item} className="horizontal_fill vertical_fill"/> 
-                    </div>);
+            if (this.props.item != undefined)
+            {
+                // This mode is for when the user is being asked to identify the location
+                // of an item in a store
+                return (<div className="vertical_layout vertical_fill">
+                        <Callout name={this.props.item.name}/>
+                        <SearchBox filterText={this.state.filterText} redoSearch={this.redoSearch}/>
+                        <AisleTable aisles={this.state.aisles} filterText={this.state.filterText.trim()} redoSearch={this.redoSearch} store={StoreStore.getCurrentStore()} item={this.props.item} className="horizontal_fill vertical_fill"/> 
+                        </div>);
+            }
+            else
+            {
+                // This mode is for maintenance of the aisles in a store
+                return (<div className="vertical_layout vertical_fill">
+                        <SearchBox filterText={this.state.filterText} redoSearch={this.redoSearch}/>
+                        <AisleManagementBanner store={this.props.store}/>
+                        <ManageAisleTable aisles={this.state.aisles} filterText={this.state.filterText.trim()} redoSearch={this.redoSearch} store={this.props.store} className="horizontal_fill vertical_fill"/> 
+                        </div>);
+
+            }
         }
     });

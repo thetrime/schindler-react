@@ -42,6 +42,13 @@ module.exports = React.createClass(
                         <StoreView/>
                         <ConnectionInfo/>
                         </div>);
+            else if (this.state.currentView == "manage_store")
+                return (<div className="vertical_layout vertical_fill">
+                        <TitleBar/>
+                        <AisleView store={SchindlerStore.getManagingStore()}/>
+                        <ConnectionInfo/>
+                        </div>);
+
         },
 
         componentWillMount: function()

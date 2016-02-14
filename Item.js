@@ -12,20 +12,20 @@ module.exports = React.createClass(
         {
             var label = this.props.label;
             var className = "app_button " + this.props.label + "_button";
-            if (this.props.settings === undefined)
+            var settings = [];
+            var main = [];
+            if (this.props.settings != undefined)
             {
-                return (<div className="horizontal_layout horizontal_fill">
-                        <div className="horizontal_fill">{this.props.item.name}</div>
-                        <div className="button_column"><button className={className} onClick={this.onClick}></button></div>
-                        </div>);
+                settings = [(<div className="settings_column" key="settings_column"><ItemSettings item={this.props.item} settings={this.props.settings}/></div>)];
             }
-            else
+            if (this.props.onClick != undefined)
             {
-                return (<div className="horizontal_layout horizontal_fill">
-                        <div className="horizontal_fill">{this.props.item.name}</div>
-                        <div className="settings_column"><ItemSettings item={this.props.item} settings={this.props.settings}/></div>
-                        <div className="button_column"><button className={className} onClick={this.onClick}></button></div>
-                        </div>);
+                main = [(<div className="button_column" key="button_column"><button className={className} onClick={this.onClick}></button></div>)];
             }
+            return (<div className="horizontal_layout horizontal_fill">
+                    <div className="horizontal_fill">{this.props.item.name}</div>
+                    {settings}
+                    {main}
+                    </div>);
         }
     });
