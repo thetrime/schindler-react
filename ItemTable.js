@@ -7,6 +7,16 @@ var NewItem = require('./NewItem');
 var PopupDialog = require('./PopupDialog');
 var StoreStore = require('./StoreStore');
 
+function item_comparator(a, b)
+{
+    if (a.name > b.name)
+        return 1;
+    else if (a.name < b.name)
+        return -1;
+    else
+        return 0;
+}
+
 module.exports = React.createClass(
     {     
         addItem: function(item)
@@ -75,46 +85,46 @@ module.exports = React.createClass(
                                                        rows.push(<Location key={groups[group].location} location="Not Available Here"/>);
                                                    else
                                                        rows.push(<Location key={groups[group].location} location={groups[group].location}/>);
-                                                   groups[group].items.forEach(function(item)
-                                                                               {
-                                                                                   var settings = [];
-                                                                                   if (item.on_list)
-                                                                                   {
-                                                                                       settings = [{label:'Hide for this store',
-                                                                                                    handler:function()
-                                                                                                    {
-                                                                                                        AppDispatcher.dispatch({operation:"set_item_location",
-                                                                                                                                origin:"client",
-                                                                                                                                data:{location:"$beyond",
-                                                                                                                                      item:item.name,
-                                                                                                                                      store:StoreStore.getCurrentStore()}});
-                                                                                                    }},
-                                                                                                   {label:'Remove from current location',
-                                                                                                    handler:function()
-                                                                                                    {
-                                                                                                        AppDispatcher.dispatch({operation:"set_item_location",
-                                                                                                                                origin:"client",
-                                                                                                                                data:{location:"unknown",
-                                                                                                                                      item:this.props.item.name,
-                                                                                                                                      store:StoreStore.getCurrentStore()}});
-                                                                                                    }},
-                                                                                                   {label:'Get it next time',
-                                                                                                    handler: function()
-                                                                                                    {
-                                                                                                        AppDispatcher.dispatch({operation:"defer",
-                                                                                                                                data:{name:this.props.item.name,
-                                                                                                                                      store:StoreStore.getCurrentStore()}});
-                                                                                                    }}];
-                                                                                   }
-                                                                                   else
-                                                                                       settings = undefined;
-                                                                                   rows.push(<Item item={item}
-                                                                                             key={item.name}
-                                                                                             onClick={item.on_list?table.gotItem:table.wantItem}
-                                                                                             label={item.on_list?"got_it":"add"}
-                                                                                             settings={settings}/>);
-                                                                               });
-                                               });
+                                                   groups[group].items.sort(item_comparator).forEach(function(item)
+                                                                                                     {
+                                                                                                         var settings = [];
+                                                                                                         if (item.on_list)
+                                                                                                         {
+                                                                                                             settings = [{label:'Hide for this store',
+                                                                                                                          handler:function()
+                                                                                                                          {
+                                                                                                                              AppDispatcher.dispatch({operation:"set_item_location",
+                                                                                                                                                      origin:"client",
+                                                                                                                                                      data:{location:"$beyond",
+                                                                                                                                                            item:item.name,
+                                                                                                                                                            store:StoreStore.getCurrentStore()}});
+                                                                                                                          }},
+                                                                                                                         {label:'Remove from current location',
+                                                                                                                          handler:function()
+                                                                                                                          {
+                                                                                                                              AppDispatcher.dispatch({operation:"set_item_location",
+                                                                                                                                                      origin:"client",
+                                                                                                                                                      data:{location:"unknown",
+                                                                                                                                                            item:item.name,
+                                                                                                                                                            store:StoreStore.getCurrentStore()}});
+                                                                                                                          }},
+                                                                                                                         {label:'Get it next time',
+                                                                                                                          handler: function()
+                                                                                                                          {
+                                                                                                                              AppDispatcher.dispatch({operation:"defer",
+                                                                                                                                                      data:{name:item.name,
+                                                                                                                                                            store:StoreStore.getCurrentStore()}});
+                                                                                                                          }}];
+                                                                                                         }
+                                                                                                         else
+                                                                                                             settings = undefined;
+                                                                                                         rows.push(<Item item={item}
+                                                                                                                   key={item.name}
+                                                                                                                   onClick={item.on_list?table.gotItem:table.wantItem}
+                                                                                                                   label={item.on_list?"got_it":"add"}
+                                                                                                                   settings={settings}/>);
+                                                                                                     });
+                                                              });
             
             return (<div className="table_container vertical_fill">
                     {rows}

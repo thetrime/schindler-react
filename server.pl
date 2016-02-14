@@ -178,6 +178,13 @@ handle_message(Key, new_store, Message):-
                     )),
         ws_send_message(Key, new_store, Message).
 
+handle_message(Key, delete_store, Message):-
+        Store = Message.store,
+        transaction(Key,
+                    Connection,
+                    delete(Connection, store(Key, Store))),
+        ws_send_message(Key, delete_store, Message).
+
 handle_message(Key, set_store_location, Message):-
         Name = Message.name,
         Latitude = Message.latitude,

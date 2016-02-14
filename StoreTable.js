@@ -52,7 +52,20 @@ module.exports = React.createClass(
             var table = this;
             this.props.stores.sort().forEach(function(store)
                                              {
-                                                 rows.push(<Item item={store} key={store.name} onClick={table.selectStore} label='select'/>);
+                                                 var settings = [{label:'Delete this store',
+                                                                  handler: function()
+                                                                  {
+                                                                      AppDispatcher.dispatch({operation:"delete_store",
+                                                                                              origin:"client",
+                                                                                              data:{store:store.name}});
+                                                                  }},
+                                                                 {label:'Configure locations in this store',
+                                                                  handler:function()
+                                                                  {
+                                                                      AppDispatcher.dispatch({operation:"manage_store",
+                                                                                              data:{store:store.name}});
+                                                                  }}];
+                                                 rows.push(<Item item={store} key={store.name} onClick={table.selectStore} label='select' settings={settings}/>);
                                             });
             return (<div className="table_container vertical_fill">
                     {rows}

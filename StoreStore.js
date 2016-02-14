@@ -3,7 +3,7 @@ var assign = require('object-assign');
 var EventEmitter = require('events').EventEmitter;
 var ServerConnection = require('./ServerConnection');
 var GPSTracker = require('./GPSTracker');
-var stores = [];
+var stores = {};
 var all_items = [];
 var current_list = [];
 var current_store = 'home';
@@ -42,7 +42,9 @@ function restoreDeferredItems()
                            {
                                addItemToCurrentList({name:item});
                            });
-    deferred_items = [];    
+    deferred_items = [];
+    localStorage.setItem("deferred_items", JSON.stringify([]));
+
 }
 
 function getNearestStoreTo(position)
@@ -331,7 +333,28 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                               StoreStore.emitChange();
                                                           }
                                                       }
-
+                                                      if (event.operation == "delete_store")
+                                                      {
+                                                          if (event.data.store == 'home')
+                                                          {
+                                                              // You can never delete the home store since we must always be /somewhere/
+                                                              if (event.origin == 'client')
+                                                                  alert('You cannot delete the home store');
+                                                          }
+                                                          else
+                                                          {
+                                                              delete stores[event.data.store];
+                                                              if (current_store == event.data.store)
+                                                              {
+                                                                  // Hmm. First we must pick another store. If this is the last store, we could raise an alert
+                                                                  // However, what if someone ELSE has deleted all the stores?
+                                                                  current_store = getNearestStoreTo(GPSTracker.getLocation());
+                                                              }
+                                                              if (event.origin == "client")
+                                                                  ServerConnection.sendMessage(event);
+                                                              StoreStore.emitChange();
+                                                          }
+                                                      }
                                                   });
 
 module.exports = StoreStore;
