@@ -49,7 +49,7 @@ module.exports = React.createClass(
             return (<div className="vertical_layout vertical_fill">
                     <Callout name={this.props.item.name}/>
                     <SearchBox filterText={this.state.filterText} redoSearch={this.redoSearch}/>
-                    <AisleTable aisles={this.state.aisles} filterText={this.state.filterText} redoSearch={this.redoSearch} store={StoreStore.getCurrentStore()} item={this.props.item} className="horizontal_fill vertical_fill"/> 
+                    <AisleTable aisles={this.state.aisles} filterText={this.state.filterText.trim()} redoSearch={this.redoSearch} store={StoreStore.getCurrentStore()} item={this.props.item} className="horizontal_fill vertical_fill"/> 
                     </div>);
         }
     });

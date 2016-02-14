@@ -16,9 +16,10 @@ ReactDOM.render(<div className="root vertical_layout">
 
 /* To do list:
    * Geolocation to move between stores automatically
+      * Need an 'unknown location' then. Get rid of the 'home' location, and start here
+      * Also if all locations are deleted we would end up here
    * Undo
    * Details screen for items
-   * Defer mode and relocate mode. (Maybe put this inside the details screen?)
    * Secure password management (or at least not totally insecure management!)
    * Gzip large items
    * Native version :P
