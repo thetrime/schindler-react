@@ -20,7 +20,7 @@ module.exports = React.createClass(
             // Also delete the item from the list
             AppDispatcher.dispatch({operation:"got_item",
                                     data:{location:aisle,
-                                          name:this.props.item}});
+                                          name:this.props.item.name}});
 
         },
         
