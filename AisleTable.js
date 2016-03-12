@@ -42,14 +42,15 @@ module.exports = React.createClass(
             var rows = [];
             var filter = this.props.filterText;
             var exactMatch = false;
+            var i = 0;
             if (filter != '' && !exactMatch)
             {
-                rows.push(<NewItem name={filter} key={filter} addItem={this.addNewAisle} label="add"/>);
+                rows.push(<NewItem name={filter} key={filter} addItem={this.addNewAisle} label="add" zebra={(i++) % 2 == 1}/>);
             }
             var table = this;
             this.props.aisles.sort().forEach(function(aisle)
                                              {
-                                                 rows.push(<Item item={aisle} key={aisle.name} onClick={table.selectAisle} label='select'/>);
+                                                 rows.push(<Item item={aisle} key={aisle.name} onClick={table.selectAisle} label='select' zebra={(i++) % 2 == 1}/>);
                                             });
             return (<div className="table_container vertical_fill">
                     {rows}

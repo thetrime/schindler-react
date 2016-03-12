@@ -22,10 +22,13 @@ module.exports = React.createClass(
             {
                 main = [(<div className="button_column" key="button_column"><button className={className} onClick={this.onClick}></button></div>)];
             }
-            return (<div className="horizontal_layout horizontal_fill">
-                    <div className="horizontal_fill">{this.props.item.name}</div>
+            var zebraClass = this.props.zebra?" zebra":"";
+            return (<div className={"horizontal_layout horizontal_fill" + zebraClass}>
+                    <div className="horizontal_fill item">
+                    <div className="horizontal_fill item_label">{this.props.item.name}</div>
                     {settings}
                     {main}
+                    </div>
                     </div>);
         }
     });

@@ -2,7 +2,18 @@
 {
     background: grey;
     color: white;
-    margin-bottom: 5px;
+    /*margin-bottom: 5px;*/
+}
+
+.item
+{
+    position:relative;
+}
+
+.item_label
+{
+    position: absolute;
+    top: 25%;
 }
 
 .item_table
@@ -21,6 +32,10 @@
     width: 100%;
 }
 
+.zebra
+{
+    background: #f0f0f0;
+}
 
 
 .settings_column
