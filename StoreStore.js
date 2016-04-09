@@ -56,7 +56,7 @@ function getNearestStoreTo(position)
                                 {
                                     var d = GPSTracker.haversine(stores[storeName].location, position);
                                     console.log('Distance to ' + storeName + ' is ' + d + ' metres');
-                                    if (d < 500 && d < distance)
+				    if (d < 500 && (distance == -1 || d < distance))
                                     //if (distance == -1 || d < distance)
                                     {
                                         distance = d;
@@ -79,7 +79,8 @@ function ensureAisleExists(store, aisle)
         }
     }
     if (!found)
-        stores[store].aisles.push({name:aisle});
+        stores[store].aisles.push({name:aisle,
+                                   index:-1});
 }
 
 var StoreStore = assign({},
@@ -125,15 +126,40 @@ var StoreStore = assign({},
                                     return stores[current_store].item_locations[item];
                             },
 
+                            getIndexOfAisle: function(aisleName)
+                            {
+                                stores[current_store].aisles.forEach(function(aisle)
+                                                                     {
+                                                                         if (aisle.name == aisleName)
+                                                                             return aisle.index;
+                                                                     });
+                                return -1;
+                            },
+
                             getAislesForCurrentStore: function()
                             {
                                 var aisles = [];
                                 if (current_store == undefined)
                                     return [];
+                                console.log('Getting aisles');
+                                console.log(stores[current_store].aisles);
                                 stores[current_store].aisles.forEach(function(aisle)
                                                                      {
-                                                                         aisles.push({name:aisle.name});
+                                                                         aisles.push({name:aisle.name,
+                                                                                      index:aisle.index});
                                                                      });
+                                return aisles;
+                            },
+                            
+                            getAislesForStore: function(store)
+                            {
+                                var aisles = [];
+                                console.log(stores[store].aisles);
+                                stores[store].aisles.forEach(function(aisle)
+                                                             {
+                                                                 aisles.push({name:aisle.name,
+                                                                              index:aisle.index});
+                                                             });
                                 return aisles;
                             },                            
 
@@ -190,7 +216,8 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                           // For every aisle, create a reference in the appropriate store
                                                           event.data.aisles.forEach(function(aisle)
                                                                                     {
-                                                                                        stores[aisle.store].aisles.push({name:aisle.name});
+                                                                                        stores[aisle.store].aisles.push({name:aisle.name,
+                                                                                                                         index:aisle.index});
                                                                                     });
                                                           // Finally, for each item with a known location, put it in the right htable
                                                           event.data.item_locations.forEach(function(store)
@@ -359,6 +386,45 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                               StoreStore.emitChange();
                                                           }
                                                       }
+                                                      if (event.operation == "delete_aisle")
+                                                      {
+                                                          // FIXME: implement
+                                                      }
+                                                      if (event.operation == "move_aisle_up")
+                                                      {
+                                                          var prev_aisle;
+                                                          var this_aisle;
+                                                          stores[event.data.store].aisles.forEach(function(aisle)
+                                                                                                  {
+                                                                                                      if (aisle.name == event.data.name)
+                                                                                                          this_aisle = aisle;
+                                                                                                  });
+                                                          if (this_aisle.index > 0)
+                                                          {
+                                                              stores[event.data.store].aisles.forEach(function(aisle)
+                                                                                                      {
+                                                                                                          if (aisle.index == this_aisle.index - 1)
+                                                                                                              prev_aisle = aisle;
+                                                                                                      });                                
+                                                              ServerConnection.sendMessage({operation: "set_aisle_indices",
+                                                                                            data: {store:event.data.store,
+                                                                                                   indices:[{name:event.data.name,
+                                                                                                             index:prev_aisle.index},
+                                                                                                            {name:prev_aisle.name,
+                                                                                                             index:prev_aisle.index+1}]}});
+                                                              console.log(this_aisle.name + ' -> '+ prev_aisle.index);
+                                                              console.log(prev_aisle.name + ' -> '+ (prev_aisle.index+1));
+                                                              this_aisle.index = prev_aisle.index;
+                                                              prev_aisle.index = prev_aisle.index+1;
+                                                              StoreStore.emitChange();
+                                                          }
+                                                      }
+                                                      if (event.operation == "set_aisle_indices")
+                                                      {
+                                                          // FIXME: Implement :(
+                                                      }
+
+                                                      
                                                   });
 
 module.exports = StoreStore;
