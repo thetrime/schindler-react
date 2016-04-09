@@ -79,9 +79,10 @@ module.exports = React.createClass(
                                      groups[item.location].items.push(item);
                              });
             var table = this;
+            var i = 0;
             if (filter != '' && !exactMatch)
             {
-                rows.push(<NewItem name={filter} key={filter} addItem={table.addItem} label="add"/>);
+                rows.push(<NewItem name={filter} key={filter} addItem={table.addItem} label="add" zebra={(i++) % 2 == 1}/>);
             }
             Object.keys(groups).sort().forEach(function(group)
                                                {
@@ -129,6 +130,7 @@ module.exports = React.createClass(
                                                                                                          else
                                                                                                              settings = undefined;
                                                                                                          rows.push(<Item item={item}
+                                                                                                                   zebra={(i++) % 2 == 1}
                                                                                                                    key={item.name}
                                                                                                                    onClick={item.on_list?table.gotItem:table.wantItem}
                                                                                                                    label={item.on_list?"got_it":"add"}

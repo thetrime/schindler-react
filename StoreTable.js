@@ -59,9 +59,10 @@ module.exports = React.createClass(
             var rows = [];
             var filter = this.props.filterText;
             var exactMatch = false;
+            var i = 0;
             if (filter != '' && !exactMatch)
             {
-                rows.push(<NewItem name={filter} key={filter} addItem={this.newStore} label="add"/>);
+                rows.push(<NewItem name={filter} key={filter} addItem={this.newStore} label="add" zebra={(i++) % 2 == 1}/>);
             }
             var table = this;
             this.props.stores.sort().forEach(function(store)
@@ -79,7 +80,7 @@ module.exports = React.createClass(
                                                                       AppDispatcher.dispatch({operation:"manage_store",
                                                                                               data:{store:store.name}});
                                                                   }}];
-                                                 rows.push(<Item item={store} key={store.name} onClick={table.selectStore} label='select' settings={settings}/>);
+                                                 rows.push(<Item item={store} key={store.name} onClick={table.selectStore} label='select' settings={settings} zebra={(i++) % 2 == 1}/>);
                                             });
             return (<div className="table_container vertical_fill">
                     {rows}
