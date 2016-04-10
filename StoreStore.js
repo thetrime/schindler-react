@@ -232,7 +232,7 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                                                                                      });
 											    });
 							  // Also, consider that we may now have moved
-							  current_store = getNearestStoreTo(GPSTracker.getLocation()));
+							  current_store = getNearestStoreTo(GPSTracker.getLocation());
 							  setCurrentList(event.data.list);
                                                           StoreStore.emitChange();
                                                       }
