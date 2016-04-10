@@ -51,7 +51,8 @@ function getNearestStoreTo(position)
 {
     var distance = -1;
     var store;
-    console.log("Getting nearest store from " + stores);
+    console.log("Getting nearest store from ");
+    console.log(stores);
     Object.keys(stores).forEach(function(storeName)
                                 {
                                     var d = GPSTracker.haversine(stores[storeName].location, position);
