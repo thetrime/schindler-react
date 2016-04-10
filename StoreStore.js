@@ -230,8 +230,10 @@ StoreStore.dispatchToken = AppDispatcher.register(function(event)
                                                                                                                                                  stores[store.store_name].item_locations[item] = aisle.aisle_name;
                                                                                                                                              });
                                                                                                                      });
-                                                                                            });
-                                                          setCurrentList(event.data.list);                                                          
+											    });
+							  // Also, consider that we may now have moved
+							  current_store = getNearestStoreTo(GPSTracker.getLocation()));
+							  setCurrentList(event.data.list);
                                                           StoreStore.emitChange();
                                                       }
                                                       if (event.operation == "set_item_location")
