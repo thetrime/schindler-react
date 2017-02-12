@@ -12,7 +12,12 @@
 
 :- http_handler(root(ws), http_upgrade_to_websocket(ws, []), [spawn([])]).
 :- http_handler(root(.), http_reply_from_files('.', [indexes(['schindler.html'])]), [prefix]).
-:- http_handler(root('.well-known'), http_reply_from_files('acme', []), [prefix]).
+:- http_handler(root('.well-known'), acme, [prefix, priority(1)]).
+
+acme(Request):-
+        memberchk(path_info(Path), Request),
+        format(atom(ActualPath), 'acme~w', [Path]),
+        http_reply_file(ActualPath, [], Request).
 
 
 :-dynamic(listener/2).
