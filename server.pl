@@ -12,7 +12,7 @@
 
 :- http_handler(root(ws), http_upgrade_to_websocket(ws, []), [spawn([])]).
 :- http_handler(root(.), http_reply_from_files('.', [indexes(['schindler.html'])]), [prefix]).
-:- http_handler(root('.well-known'), http_reply_from_files('acme', []), [prefix]), [prefix]).
+:- http_handler(root('.well-known'), http_reply_from_files('acme', []), [prefix]).
 
 
 :-dynamic(listener/2).
