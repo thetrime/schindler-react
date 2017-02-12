@@ -12,6 +12,7 @@
 
 :- http_handler(root(ws), http_upgrade_to_websocket(ws, []), [spawn([])]).
 :- http_handler(root(.), http_reply_from_files('.', [indexes(['schindler.html'])]), [prefix]).
+:- http_handler(root('.well-known'), http_reply_from_files('acme', []), [prefix])., [prefix]).
 
 
 :-dynamic(listener/2).
@@ -74,6 +75,8 @@ run:-
         prepare_database,
         prolog_server(9998, []),
         http_server(http_dispatch, [port(9999)]),
+        % ACME
+        http_server(http_dispatch, [port(80)]),
         http_server(http_dispatch, [port(9443),
                                     ssl([certificate_file('cert.pem'),
                                          key_file('key.pem')])]).
