@@ -15,7 +15,7 @@
 :- http_handler(root('.well-known'), acme, [prefix, priority(1)]).
 
 acme(Request):-
-        memberchk(path_info(Path), Request),
+        memberchk(path(Path), Request),
         format(atom(ActualPath), 'acme~w', [Path]),
         http_reply_file(ActualPath, [], Request).
 
