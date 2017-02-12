@@ -4,6 +4,7 @@
 :- use_module(library(http/http_files)).
 :- use_module(library(http/json)).
 :- use_module(library(http/http_session)).
+:- use_module(library(http/http_ssl_plugin)).
 
 :-ensure_loaded(testing).
 :-ensure_loaded(database).
