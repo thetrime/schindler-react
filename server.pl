@@ -72,7 +72,10 @@ dispatch(WebSocket):-
 run:-
         prepare_database,
         prolog_server(9998, []),
-        http_server(http_dispatch, [port(9999)]).
+        http_server(http_dispatch, [port(9999)]),
+        http_server(http_dispatch, [port(9443),
+                                    ssl([certificate_file('cert.pem'),
+                                         key_file('key.pem')])]).
 
 wait:-
         thread_get_message(_).
