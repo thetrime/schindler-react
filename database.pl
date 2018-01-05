@@ -48,7 +48,7 @@ end_transaction(Key, Connection, !, _):-
         odbc_end_transaction(Connection, commit).
 
 update_checkpoint(Connection, Key):-
-        make_uuid(UUID),
+        make_uuid(Connection, UUID),
         delete_checkpoint(Connection, Key),        
         setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO checkpoint(key, checkpoint) VALUES (?, ?)', [varchar, varchar], Statement, []),
                            odbc_execute(Statement, [Key, UUID], _),
@@ -169,14 +169,14 @@ list_item(Key, Item):-
 
 check_login(Username, Password):-
         format(user_error, 'in check_login/2~n', []),
-        ( ??select(Connection,
-                 setup_call_cleanup(??odbc_prepare(Connection, 'SELECT password FROM users WHERE username = ?', [varchar], Statement, []),
-                                    ??odbc_execute(Statement, [Username], row(ExpectedPassword)),
-                                    ??odbc_free_statement(Statement)))->
+        ( select(Connection,
+                 setup_call_cleanup(odbc_prepare(Connection, 'SELECT password FROM users WHERE username = ?', [varchar], Statement, []),
+                                    odbc_execute(Statement, [Username], row(ExpectedPassword)),
+                                    odbc_free_statement(Statement)))->
             Password == ExpectedPassword
         ; otherwise->
             % New user. Just check them in
-            ??transaction(Username, Connection, insert(Connection, user(Username, Password)))
+            transaction(Username, Connection, insert(Connection, user(Username, Password)))
         ).
 
 checkpoint(Key, Checkpoint):-
@@ -192,13 +192,13 @@ checkpoint(Key, Checkpoint):-
 
 :-meta_predicate(select(?, 0)).
 select(Connection, Goal):-        
-        setup_call_cleanup(??get_connection(Connection),
+        setup_call_cleanup(get_connection(Connection),
                            Goal,
                            odbc_end_transaction(Connection, rollback)).
         
 get_connection(Connection):-
         with_mutex(connection_mutex,
-                   ??get_connection_1(Connection)).
+                   get_connection_1(Connection)).
 
 :-thread_local(cached_connection/1).
 get_connection_1(Connection):-
