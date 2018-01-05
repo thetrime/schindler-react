@@ -28,7 +28,8 @@ ws(Websocket):-
         client(ClientId, Websocket, {null}).
 
 client(ClientId, WebSocket, Key) :-
-        format(user_error, 'Waiting for message...~n', []),
+        format(user_error, 'About to print debug~n', []),
+        ??format(user_error, 'Waiting for message...~n', []),
         ws_receive(WebSocket, Message, [format(json), value_string_as(atom)]),
         format(user_error, 'User ~w: Message: ~q~n', [Key, Message]),
         ( Message.opcode == close ->
@@ -39,10 +40,10 @@ client(ClientId, WebSocket, Key) :-
             Fields = Data.data,
             ( Operation == login->
                 % This is slightly different logic
-                login(Fields, ClientId, Key, NewKey)
+                ??login(Fields, ClientId, Key, NewKey)
             ; otherwise->
                 NewKey = Key,
-                ( catch(handle_message(Key, Operation, Fields),
+                ( catch(??handle_message(Key, Operation, Fields),
                         Exception,
                         format(user_error, 'Error: ~p~n', [Exception]))->
                     true
