@@ -92,9 +92,10 @@ wait:-
 %-------------------------------------
 
 login(Fields, ClientId, Key, NewKey):-
+        format(user_error, 'Fields: ~q~n', [Fields]),
         Username = Fields.username,
         Password = Fields.password,
-        ( check_login(Username, Password)->
+        ( ??check_login(Username, Password)->
             NewKey = Username,
             retractall(listener(_, ClientId)),
             assert(listener(NewKey, ClientId)),
