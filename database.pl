@@ -13,7 +13,14 @@
           transaction/3]).
 
 :-use_module(library(odbc)).
+:-if(current_predicate(heroku_db_connect/1)).
+make_uuid(Connection, UUID):-
+        odbc_query(Connection, 'SELECT uuid_generate_v1()', row(UUID)).
+:-else.
 :-use_module(library(uuid)).
+make_uuid(_Connection, UUID):-
+        uuid(UUID).
+:-endif.
 
 :-meta_predicate(transaction(+, -, 0)).
 
@@ -41,7 +48,7 @@ end_transaction(Key, Connection, !, _):-
         odbc_end_transaction(Connection, commit).
 
 update_checkpoint(Connection, Key):-
-        uuid(UUID),                
+        make_uuid(UUID),
         delete_checkpoint(Connection, Key),        
         setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO checkpoint(key, checkpoint) VALUES (?, ?)', [varchar, varchar], Statement, []),
                            odbc_execute(Statement, [Key, UUID], _),
