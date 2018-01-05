@@ -195,6 +195,13 @@ get_connection(Connection):-
 :-thread_local(cached_connection/1).
 get_connection_1(Connection):-
         cached_connection(Connection), !.
+
+get_connection_1(Connection):-
+        current_predicate(heroku_db_connect/1),
+        !,
+        heroku_db_connect(Connection),
+        assert(cached_connection(Connection)).
+
 get_connection_1(Connection):-
         odbc_connect(-,
                      Connection,
