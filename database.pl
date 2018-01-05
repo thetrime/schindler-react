@@ -190,7 +190,7 @@ select(Connection, Goal):-
         
 get_connection(Connection):-
         with_mutex(connection_mutex,
-                   get_connection_1(Connection)).
+                   ??get_connection_1(Connection)).
 
 :-thread_local(cached_connection/1).
 get_connection_1(Connection):-
