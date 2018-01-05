@@ -161,6 +161,7 @@ list_item(Key, Item):-
                                   odbc_free_statement(Statement))).
 
 check_login(Username, Password):-
+        format(user_error, 'in check_login/2~n', []),
         ( ??select(Connection,
                  setup_call_cleanup(??odbc_prepare(Connection, 'SELECT password FROM users WHERE username = ?', [default], Statement, []),
                                     ??odbc_execute(Statement, [Username], row(ExpectedPassword)),
