@@ -43,77 +43,77 @@ end_transaction(Key, Connection, !, _):-
 update_checkpoint(Connection, Key):-
         uuid(UUID),                
         delete_checkpoint(Connection, Key),        
-        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO checkpoint(key, checkpoint) VALUES (?, ?)', [default, default], Statement, []),
+        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO checkpoint(key, checkpoint) VALUES (?, ?)', [varchar, varchar], Statement, []),
                            odbc_execute(Statement, [Key, UUID], _),
                            odbc_free_statement(Statement)).
 
 delete_checkpoint(Connection, Key):-
-         setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM checkpoint WHERE key = ?', [default], Statement, []),
+         setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM checkpoint WHERE key = ?', [varchar], Statement, []),
                            odbc_execute(Statement, [Key], _),
                            odbc_free_statement(Statement)).
 
 
 insert(Connection, item(Key, Name)):-
-        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO item(key, name) VALUES (?, ?)', [default, default], Statement, []),
+        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO item(key, name) VALUES (?, ?)', [varchar, varchar], Statement, []),
                            odbc_execute(Statement, [Key, Name], _),
                            odbc_free_statement(Statement)).
 
 insert(Connection, list_item(Key, Name)):-
-        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO list_item(key, name) VALUES (?, ?)', [default, default], Statement, []),
+        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO list_item(key, name) VALUES (?, ?)', [varchar, varchar], Statement, []),
                            odbc_execute(Statement, [Key, Name], _),
                            odbc_free_statement(Statement)).
 
 insert(Connection, known_item_location(Key, Item, Store, Location)):-
-        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO known_item_location(key, item, store, location) VALUES (?, ?, ?, ?)', [default, default, default, default], Statement, []),
+        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO known_item_location(key, item, store, location) VALUES (?, ?, ?, ?)', [varchar, varchar, varchar, varchar], Statement, []),
                            odbc_execute(Statement, [Key, Item, Store, Location], _),
                            odbc_free_statement(Statement)).
 
 insert(Connection, user(Username, Password)):-
-        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO users(username, password) VALUES (?, ?)', [default, default], Statement, []),
+        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO users(username, password) VALUES (?, ?)', [varchar, varchar], Statement, []),
                            odbc_execute(Statement, [Username, Password], _),
                            odbc_free_statement(Statement)).
 
 
 insert(Connection, store(Key, Name, Latitude, Longitude)):-
-        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO store(key, name, latitude, longitude) VALUES (?, ?, ?, ?)', [default, default, float, float], Statement, []),
+        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO store(key, name, latitude, longitude) VALUES (?, ?, ?, ?)', [varchar, varchar, float, float], Statement, []),
                            odbc_execute(Statement, [Key, Name, Latitude, Longitude], _),
                            odbc_free_statement(Statement)).
 
 insert(Connection, aisle(Key, Name, Store)):-
-        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO aisle(key, name, store) VALUES (?, ?, ?)', [default, default, default], Statement, []),
+        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO aisle(key, name, store) VALUES (?, ?, ?)', [varchar, varchar, varchar], Statement, []),
                            odbc_execute(Statement, [Key, Name, Store], _),
                            odbc_free_statement(Statement)).
 
 
 update(Connection, store(Key, Name, Latitude, Longitude)):-
-        setup_call_cleanup(odbc_prepare(Connection, 'UPDATE store SET latitude=?, longitude=? WHERE name=? AND key=?', [float, float, default, default], Statement, []),
+        setup_call_cleanup(odbc_prepare(Connection, 'UPDATE store SET latitude=?, longitude=? WHERE name=? AND key=?', [float, float, varchar, varchar], Statement, []),
                            odbc_execute(Statement, [Latitude, Longitude, Name, Key], _),
                            odbc_free_statement(Statement)).
 
 
 delete(Connection, item(Key, Name)):-
-        setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM item WHERE key = ? AND name = ?', [default, default], Statement, []),
+        setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM item WHERE key = ? AND name = ?', [varchar, varchar], Statement, []),
                            odbc_execute(Statement, [Key, Name], _),
                            odbc_free_statement(Statement)).
 
 delete(Connection, list_item(Key, Name)):-
-        setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM list_item WHERE key = ? AND name = ?', [default, default], Statement, []),
+        setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM list_item WHERE key = ? AND name = ?', [varchar, varchar], Statement, []),
                            odbc_execute(Statement, [Key, Name], _),
                            odbc_free_statement(Statement)).
 
 delete(Connection, known_item_location(Key, Item, Store)):-
-        setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM known_item_location WHERE key = ? AND item = ? AND store = ?', [default, default, default], Statement, []),
+        setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM known_item_location WHERE key = ? AND item = ? AND store = ?', [varchar, varchar, varchar], Statement, []),
                            odbc_execute(Statement, [Key, Item, Store], _),
                            odbc_free_statement(Statement)).
 
 delete(Connection, store(Key, Store)):-
-        setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM known_item_location WHERE key = ? AND store = ?', [default, default], Statement1, []),
+        setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM known_item_location WHERE key = ? AND store = ?', [varchar, varchar], Statement1, []),
                            odbc_execute(Statement1, [Key, Store], _),
                            odbc_free_statement(Statement1)),
-        setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM aisle WHERE key = ? AND store = ?', [default, default], Statement2, []),
+        setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM aisle WHERE key = ? AND store = ?', [varchar, varchar], Statement2, []),
                            odbc_execute(Statement2, [Key, Store], _),
                            odbc_free_statement(Statement2)),
-        setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM store WHERE key = ? AND name = ?', [default, default], Statement3, []),
+        setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM store WHERE key = ? AND name = ?', [varchar, varchar], Statement3, []),
                            odbc_execute(Statement3, [Key, Store], _),
                            odbc_free_statement(Statement3)).
 
@@ -121,7 +121,7 @@ delete(Connection, store(Key, Store)):-
 item_location(Key, Item, Store, Aisle):-
         select(Connection,
                findall(Row,
-                       setup_call_cleanup(odbc_prepare(Connection, 'SELECT item, store, location FROM known_item_location WHERE key = ?', [default], Statement, []),
+                       setup_call_cleanup(odbc_prepare(Connection, 'SELECT item, store, location FROM known_item_location WHERE key = ?', [varchar], Statement, []),
                                           odbc_execute(Statement, [Key], Row),
                                           odbc_free_statement(Statement)),
                        Rows)),
@@ -130,7 +130,7 @@ item_location(Key, Item, Store, Aisle):-
 item(Key, Item):-
         select(Connection,
                findall(Row,
-                       setup_call_cleanup(odbc_prepare(Connection, 'SELECT name FROM item WHERE key = ?', [default], Statement, []),
+                       setup_call_cleanup(odbc_prepare(Connection, 'SELECT name FROM item WHERE key = ?', [varchar], Statement, []),
                                           odbc_execute(Statement, [Key], Row),
                                           odbc_free_statement(Statement)),
                        Rows)),
@@ -139,7 +139,7 @@ item(Key, Item):-
 aisle(Key, Name, Store):-
         select(Connection,
                findall(Row,
-                       setup_call_cleanup(odbc_prepare(Connection, 'SELECT name, store FROM aisle WHERE key = ?', [default], Statement, []),
+                       setup_call_cleanup(odbc_prepare(Connection, 'SELECT name, store FROM aisle WHERE key = ?', [varchar], Statement, []),
                                           odbc_execute(Statement, [Key], Row),
                                           odbc_free_statement(Statement)),
                        Rows)),
@@ -148,7 +148,7 @@ aisle(Key, Name, Store):-
 store(Key, Store, Latitude, Longitude):-
         select(Connection,
                findall(Row,
-                       setup_call_cleanup(odbc_prepare(Connection, 'SELECT name, latitude, longitude FROM store WHERE key = ?', [default], Statement, []),
+                       setup_call_cleanup(odbc_prepare(Connection, 'SELECT name, latitude, longitude FROM store WHERE key = ?', [varchar], Statement, []),
                                           odbc_execute(Statement, [Key], Row),
                                           odbc_free_statement(Statement)),
                        Rows)),
@@ -156,14 +156,14 @@ store(Key, Store, Latitude, Longitude):-
 
 list_item(Key, Item):-
         select(Connection,
-               setup_call_cleanup(odbc_prepare(Connection, 'SELECT name FROM list_item WHERE key = ?', [default], Statement, []),
+               setup_call_cleanup(odbc_prepare(Connection, 'SELECT name FROM list_item WHERE key = ?', [varchar], Statement, []),
                                   odbc_execute(Statement, [Key], row(Item)),
                                   odbc_free_statement(Statement))).
 
 check_login(Username, Password):-
         format(user_error, 'in check_login/2~n', []),
         ( ??select(Connection,
-                 setup_call_cleanup(??odbc_prepare(Connection, 'SELECT password FROM users WHERE username = ?', [default], Statement, []),
+                 setup_call_cleanup(??odbc_prepare(Connection, 'SELECT password FROM users WHERE username = ?', [varchar], Statement, []),
                                     ??odbc_execute(Statement, [Username], row(ExpectedPassword)),
                                     ??odbc_free_statement(Statement)))->
             Password == ExpectedPassword
@@ -174,7 +174,7 @@ check_login(Username, Password):-
 
 checkpoint(Key, Checkpoint):-
         ( select(Connection,
-                 setup_call_cleanup(odbc_prepare(Connection, 'SELECT checkpoint FROM checkpoint WHERE key = ?', [default], Statement, []),
+                 setup_call_cleanup(odbc_prepare(Connection, 'SELECT checkpoint FROM checkpoint WHERE key = ?', [varchar], Statement, []),
                                     odbc_execute(Statement, [Key], row(Checkpoint)),
                                     odbc_free_statement(Statement)))->
             true
