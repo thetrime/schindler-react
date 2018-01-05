@@ -161,14 +161,14 @@ list_item(Key, Item):-
                                   odbc_free_statement(Statement))).
 
 check_login(Username, Password):-
-        ( select(Connection,
-                 setup_call_cleanup(odbc_prepare(Connection, 'SELECT password FROM users WHERE username = ?', [default], Statement, []),
-                                    odbc_execute(Statement, [Username], row(ExpectedPassword)),
-                                    odbc_free_statement(Statement)))->
+        ( ??select(Connection,
+                 setup_call_cleanup(??odbc_prepare(Connection, 'SELECT password FROM users WHERE username = ?', [default], Statement, []),
+                                    ??odbc_execute(Statement, [Username], row(ExpectedPassword)),
+                                    ??odbc_free_statement(Statement)))->
             Password == ExpectedPassword
         ; otherwise->
             % New user. Just check them in
-            transaction(Username, Connection, insert(Connection, user(Username, Password)))
+            ??transaction(Username, Connection, insert(Connection, user(Username, Password)))
         ).
 
 checkpoint(Key, Checkpoint):-
@@ -184,7 +184,7 @@ checkpoint(Key, Checkpoint):-
 
 :-meta_predicate(select(?, 0)).
 select(Connection, Goal):-        
-        setup_call_cleanup(get_connection(Connection),
+        setup_call_cleanup(??get_connection(Connection),
                            Goal,
                            odbc_end_transaction(Connection, rollback)).
         

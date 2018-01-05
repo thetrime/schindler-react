@@ -28,8 +28,7 @@ ws(Websocket):-
         client(ClientId, Websocket, {null}).
 
 client(ClientId, WebSocket, Key) :-
-        format(user_error, 'About to print debug~n', []),
-        ??format(user_error, 'Waiting for message...~n', []),
+        format(user_error, 'Waiting for message...~n', []),
         ws_receive(WebSocket, Message, [format(json), value_string_as(atom)]),
         format(user_error, 'User ~w: Message: ~q~n', [Key, Message]),
         ( Message.opcode == close ->
