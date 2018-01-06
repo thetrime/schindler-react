@@ -21,11 +21,11 @@ heroku:-
         current_predicate(heroku_db_connect/1).
 
 transaction(Key, Connection, Goal):-
-        get_connection(Connection),
-        setup_call_catcher_cleanup(true,
-                                   once(Goal),
-                                   Catcher,
-                                   end_transaction(Key, Connection, Catcher, Goal)).
+        with_connection(Connection,
+                        setup_call_catcher_cleanup(true,
+                                                   once(Goal),
+                                                   Catcher,
+                                                   end_transaction(Key, Connection, Catcher, Goal))).
 
 end_transaction(_, Connection, fail, Goal):-
         log('Goal ~q failed', [Goal]),
@@ -201,26 +201,30 @@ checkpoint(Key, Checkpoint):-
         ).
 
 :-meta_predicate(select(?, 0)).
-select(Connection, Goal):-        
-        setup_call_cleanup(get_connection(Connection),
-                           Goal,
-                           odbc_end_transaction(Connection, rollback)).
-        
-get_connection(Connection):-
-        with_mutex(connection_mutex,
-                   get_connection_1(Connection)).
+select(Connection, Goal):-
+        with_connection(Connection, Goal).
 
-:-thread_local(cached_connection/1).
-get_connection_1(Connection):-
-        cached_connection(Connection), !.
-
-get_connection_1(Connection):-
+% In Heroku we cannot cache connections or we just end up accumulating hundreds of them and the database eventually starts rejecting the logins
+:-meta_predicate(with_connection(?, 0)).
+with_connection(Connection, Goal):-
         current_predicate(heroku_db_connect/1),
         !,
-        heroku_db_connect(Connection),
-        assert(cached_connection(Connection)).
+        setup_call_cleanup(heroku_db_connect(Connection),
+                           Goal,
+                           odbc_disconnect(Connection)).
 
-get_connection_1(Connection):-
+:-thread_local
+        cached_connection/1.
+
+with_connection(Connection, Goal):-
+        ( cached_connection(Connection)->
+            true
+        ; with_mutex(connection_mutex,
+                     cache_new_connection(Connection))
+        ),
+        Goal.
+
+cache_new_connection(Connection):-
         odbc_connect(-,
                      Connection,
                      [driver_string('DRIVER={Sqlite3};Database=schindler.db;FKSupport=True'),
@@ -229,10 +233,13 @@ get_connection_1(Connection):-
                       auto_commit(false)]),
         assert(cached_connection(Connection)).
 
+
+
 prepare_database:-
-        get_connection(Connection),
-        catch(odbc_query(Connection, 'SELECT version FROM schema', row(Version)), _, Version = 0),
-        upgrade_schema(Connection, Version).
+        with_connection(Connection,
+                        ( catch(odbc_query(Connection, 'SELECT version FROM schema', row(Version)), _, Version = 0),
+                          upgrade_schema(Connection, Version)
+                        )).
 
 upgrade_schema(Connection, From):-
         upgrade_schema_from(Connection, From),
