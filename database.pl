@@ -13,16 +13,12 @@
           transaction/3]).
 
 :-use_module(library(odbc)).
-:-if(current_predicate(heroku_db_connect/1)).
-make_uuid(Connection, UUID):-
-        odbc_query(Connection, 'SELECT uuid_generate_v1()', row(UUID)).
-:-else.
-:-use_module(library(uuid)).
-make_uuid(_Connection, UUID):-
-        uuid(UUID).
-:-endif.
 
 :-meta_predicate(transaction(+, -, 0)).
+
+heroku:-
+        % True if in a Heroku environment
+        current_predicate(heroku_db_connect/1).
 
 transaction(Key, Connection, Goal):-
         get_connection(Connection),
@@ -47,12 +43,26 @@ end_transaction(Key, Connection, !, _):-
         update_checkpoint(Connection, Key),
         odbc_end_transaction(Connection, commit).
 
+
+% The Heroku buildpack does not have library(uuid).
+% Instead, we will just use the SERIAL type to autogenerate unique values on insert
+:-if(heroku).
 update_checkpoint(Connection, Key):-
-        make_uuid(Connection, UUID),
-        delete_checkpoint(Connection, Key),        
+        delete_checkpoint(Connection, Key),
+        setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO checkpoint(key) VALUES (?)', [varchar], Statement, []),
+                           odbc_execute(Statement, [Key], _),
+                           odbc_free_statement(Statement)).
+:-else.
+:-use_module(library(uuid)).
+update_checkpoint(Connection, Key):-
+        delete_checkpoint(Connection, Key),
+        uuid(UUID),
         setup_call_cleanup(odbc_prepare(Connection, 'INSERT INTO checkpoint(key, checkpoint) VALUES (?, ?)', [varchar, varchar], Statement, []),
                            odbc_execute(Statement, [Key, UUID], _),
                            odbc_free_statement(Statement)).
+:-endif.
+
+
 
 delete_checkpoint(Connection, Key):-
          setup_call_cleanup(odbc_prepare(Connection, 'DELETE FROM checkpoint WHERE key = ?', [varchar], Statement, []),
@@ -243,8 +253,11 @@ upgrade_schema_from(Connection, 0):-
         odbc_query(Connection, 'CREATE TABLE store(key VARCHAR, name VARCHAR, latitude VARCHAR, longitude VARCHAR, PRIMARY KEY(key, name))', _),
         odbc_query(Connection, 'CREATE TABLE aisle(key VARCHAR, store VARCHAR, name VARCHAR, PRIMARY KEY(key, store, name), FOREIGN KEY(key, store) REFERENCES store(key, name))', _),
         odbc_query(Connection, 'CREATE TABLE known_item_location(key VARCHAR, item VARCHAR, store VARCHAR, location VARCHAR, FOREIGN KEY(key, item) REFERENCES item(key, name), FOREIGN KEY(key, store) REFERENCES store(key, name), FOREIGN KEY(key, store, location) REFERENCES aisle(key, store, name))', _),
-        odbc_query(Connection, 'CREATE TABLE checkpoint(key VARCHAR, checkpoint VARCHAR)', _),
-
+        ( heroku ->
+            odbc_query(Connection, 'CREATE TABLE checkpoint(key VARCHAR, checkpoint SERIAL)', _)
+        ; otherwise->
+            odbc_query(Connection, 'CREATE TABLE checkpoint(key VARCHAR, checkpoint VARCHAR)', _)
+        ),
         % Insert some random data        
         odbc_query(Connection, 'INSERT INTO store(key, name) VALUES (\'matt\', \'home\')', _),
         odbc_query(Connection, 'INSERT INTO store(key, name) VALUES (\'matt\', \'tesco\')', _),
