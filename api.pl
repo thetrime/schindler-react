@@ -1,6 +1,6 @@
 :-module(api, []).
 
-:- http_handler(root(add), add_item, []).
+:- http_handler(root('api/add_item'), add_item, []).
 
 add_item(Request):-
         memberchk(search(Search), Request),
