@@ -8,6 +8,7 @@
 
 :-ensure_loaded(testing).
 :-ensure_loaded(database).
+:-ensure_loaded(api).
 
 
 :- http_handler(root(ws), http_upgrade_to_websocket(ws, []), [spawn([])]).
@@ -95,7 +96,7 @@ login(Fields, ClientId, Key, NewKey):-
         format(user_error, 'Fields: ~q~n', [Fields]),
         Username = Fields.username,
         Password = Fields.password,
-        ( ??check_login(Username, Password)->
+        ( check_login(Username, Password)->
             NewKey = Username,
             retractall(listener(_, ClientId)),
             assert(listener(NewKey, ClientId)),
