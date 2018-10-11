@@ -54,7 +54,7 @@ update_checkpoint(Connection, Key):-
                            odbc_execute(Statement, [Key], _),
                            odbc_free_statement(Statement)).
 :-else.
-varchar_type(default),
+varchar_type(default).
 :-use_module(library(uuid)).
 update_checkpoint(Connection, Key):-
         delete_checkpoint(Connection, Key),
