@@ -1,5 +1,6 @@
 :-module(api, []).
 
+:-use_module(library(http/http_client)).
 :- http_handler(root('api/add_item'), add_item, []).
 
 add_item(Request):-
