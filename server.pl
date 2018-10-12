@@ -83,9 +83,12 @@ run:-
         http_server(http_dispatch, [port(9999)]),
         % ACME. Assumes port 80 is mapped to 8080 using something like "iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080"
         http_server(http_dispatch, [port(8080)]),
-        http_server(http_dispatch, [port(9443),
-                                    ssl([certificate_file('cert.pem'),
-                                         key_file('key.pem')])]).
+        ( exists_file('cert.pem') ->
+            http_server(http_dispatch, [port(9443),
+                                        ssl([certificate_file('cert.pem'),
+                                             key_file('key.pem')])])
+        ; true
+        ).
 
 wait:-
         thread_get_message(_).
