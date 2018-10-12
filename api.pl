@@ -8,7 +8,11 @@ add_item(Request):-
         memberchk(key=Key, Search),
         http_read_data(Request, Item, []),
         ( list_item(Key, Item)->
-            format('Content-Type: text/plain~n~n~w is already on the list', [Item])
+            ( sub_atom(Item, _, 1, 0, s)->
+                format('Content-Type: text/plain~n~n~w are already on the list', [Item])
+            ; otherwise->
+                format('Content-Type: text/plain~n~n~w is already on the list', [Item])
+            )
         ; otherwise->
             handle_message(Key, want_item, _{name:Item}),
             format('Content-Type: text/plain~n~nOK, added', [])
