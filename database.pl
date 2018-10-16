@@ -223,7 +223,7 @@ checkpoint(Key, Checkpoint):-
 
 :-meta_predicate(select(?, 0)).
 select(Connection, Goal):-
-        with_connection(Connection, Goal), !, odbc_end_transaction(Connection, rollback).
+        setup_call_cleanup(true, with_connection(Connection, Goal), odbc_end_transaction(Connection, rollback)).
 
 % In Heroku we cannot cache connections or we just end up accumulating hundreds of them and the database eventually starts rejecting the logins
 :-meta_predicate(with_connection(?, 0)).
